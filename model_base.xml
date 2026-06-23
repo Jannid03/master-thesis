@@ -25,7 +25,20 @@
     </Time>
     <Analysis>
         <ModelGraph include-tags="#untagged,cytoplasm,nucleus" format="dot" reduced="false"/>
-        <Logger time-step="1.0">
+        <Logger time-step="1.0" name="Position">
+            <Input>
+                <Symbol symbol-ref="cell.center.x"/>
+                <Symbol symbol-ref="cell.center.y"/>
+                <Symbol symbol-ref="cell.surface"/>
+            </Input>
+            <Output>
+                <TextOutput file-format="csv"/>
+            </Output>
+            <Restriction>
+                <Celltype celltype="macrophage"/>
+            </Restriction>
+        </Logger>
+        <Logger time-step="1.0" name="Cells">
             <Input>
                 <Symbol symbol-ref="IKBA"/>
                 <Symbol symbol-ref="IKBA.m"/>
@@ -34,10 +47,6 @@
                 <Symbol symbol-ref="IKK_IKBA"/>
                 <Symbol symbol-ref="IKK_NFKB_IKBA"/>
                 <Symbol symbol-ref="total_IKK"/>
-                <!--    <Disabled>
-        <Symbol symbol-ref="IKKconc"/>
-    </Disabled>
--->
                 <Symbol symbol-ref="IKK_sum"/>
                 <Symbol symbol-ref="NFKB"/>
                 <Symbol symbol-ref="NFKB.n"/>
@@ -45,21 +54,14 @@
                 <Symbol symbol-ref="NFKB_IKBA.n"/>
                 <Symbol symbol-ref="total_NFKB"/>
                 <Symbol symbol-ref="TNFaflux"/>
-                <Symbol symbol-ref="cell.surface"/>
                 <Symbol symbol-ref="eTNFa"/>
                 <Symbol symbol-ref="LPS"/>
-                <Symbol symbol-ref="cell.center.x"/>
-                <Symbol symbol-ref="cell.center.y"/>
             </Input>
             <Output>
                 <TextOutput file-format="csv"/>
             </Output>
             <Restriction>
-                <!--    <Disabled>
-        <Celltype celltype="cells"/>
-    </Disabled>
--->
-                <Cells cell-ids="20"/>
+                <Celltype celltype="macrophage"/>
             </Restriction>
             <Plots>
                 <Plot time-step="-1">
@@ -151,7 +153,7 @@
             </Plot>
             <Terminal name="png"/>
         </Gnuplotter>
-        <Logger time-step="1.0">
+        <!-- <Logger time-step="1.0">
             <Input>
                 <Symbol symbol-ref="TNFaflux"/>
                 <Symbol symbol-ref="cell.surface"/>
@@ -172,7 +174,6 @@
                 <!--    <Disabled>
         <Cells cell-ids="2"/>
     </Disabled>
--->
             </Restriction>
             <Plots>
                 <Plot time-step="-1">
@@ -238,9 +239,9 @@
             </Color-bar>
         </Plot>
     </Disabled>
--->
+
             </Plots>
-        </Logger>
+        </Logger> -->
         <Logger time-step="1.0">
             <Input>
                 <Symbol symbol-ref="eTNFa"/>
