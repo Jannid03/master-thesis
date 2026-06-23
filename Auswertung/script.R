@@ -10,17 +10,37 @@ setwd("D:/Uni/Masterarbeit/data")
 file_xml <- read_xml("model_base.xml")
 
 
-parameter = "a1"
-path <- paste("//CellTypes//System//Constant[@symbol=","\"",parameter,"\"]",sep = "")
+parameter = "tmax"
+path <- paste("//CellTypes//Property[@symbol=","\"",parameter,"\"]",sep = "")
 value <- xml_double(xml_find_all(file_xml,paste(path, "//@value")))
 n <- 1
 output <- paste("runs/",parameter,sep="")
 
+make_expression <- function(i) {
+  if (i == 36){
+    return (paste("if(cell.id==36,",rnormTrunc(1,value,sd=1,min=0),",",value,")",sep=''))
+  }
+  else {
+    expression <- "if(cell.id=="
+    expression <- paste(expression,i,",",rnormTrunc(1,value,sd=1,min=0),",",make_expression(i+1),")",sep='')
+    return (expression)
+  }
+}
+
+expr <- make_expression(1)
+
+expr_path <- (xml_find_first(file_xml,"//CellPopulations//Population"))
+xml_add_child(expr_path,"InitProperty")
+xml_set_attr(xml_find_first(file_xml, "//CellPopulations//Population//InitProperty"), "symbol-ref",parameter)
+xml_add_child(xml_find_first(file_xml, "//CellPopulations//Population//InitProperty"),"Expression",expr)
+
+
+
+
+
 for (i in 1:n) {
-  # mod_val <- rnormTrunc(1,value,sd=1,min=0)
-  mod_val <- value
-  xml_set_attr(xml_find_all(file_xml, path), "value",mod_val)
-  dir <- paste(output,"/",parameter,"=",round(mod_val,3),sep="")
+  # dir <- paste(output,"/",parameter,"=",round(mod_val,3),sep="")
+  dir <- paste(output,"/run_",formatC(i,width=3,flag='0'),sep="")
   dir.create((dir), recursive = TRUE)
   write_xml(file_xml, paste(dir,"/model.xml",sep=""))
 
@@ -31,11 +51,15 @@ for (i in 1:n) {
   output <- system(command)
 }
 
-df <- read.csv("runs/a1/a1=1.35/logger_1.csv", header = TRUE, dec = '.', sep = "\t")
+base <- read.csv("base/logger_2.csv", header = TRUE, dec = '.', sep = "\t")
+
+df <- read.csv("runs/tmax/run_001/logger_2.csv", header = TRUE, dec = '.', sep = "\t")
 df <- as_tibble(df)
-df_60 <- df |> slice_head(n=200)
-  
-ggplot(data=df_60, mapping=aes(x=time))+
+
+df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
+
+df |> filter(cell.id == "20") |>
+ggplot(mapping=aes(x=time))+
   ggtitle("NFKB over time")+
   geom_line(aes(y=NFKB.n,color="NFKB.n"))+
   geom_line(aes(y=NFKB, color='NFKB'))+
@@ -45,7 +69,8 @@ ggplot(data=df_60, mapping=aes(x=time))+
   scale_color_manual(values=c("blue","red","green",'yellow','black'))+
   guides(color=guide_legend(title="Component"))
 
-ggplot(data=df_60, mapping=aes(x=time))+
+df |> filter(cell.id == "20") |>
+ggplot(mapping=aes(x=time))+
   ggtitle("IKK over time")+
   geom_line(aes(y=IKK,color="IKK"))+
   geom_line(aes(y=total_IKK,color="Total IKK"))+
@@ -54,7 +79,8 @@ ggplot(data=df_60, mapping=aes(x=time))+
   scale_color_manual(values=c("blue","red","green",'yellow'))+
   guides(color=guide_legend(title="Component"))
 
-ggplot(data=df_60, mapping=aes(x=time))+
+df |> filter(cell.id == "20") |>
+ggplot(mapping=aes(x=time))+
   ggtitle("IKBA over time")+
   geom_line(aes(y=IKBA.m,color="IKBA mRNA"))+
   geom_line(aes(y=IKBA.n, color='IKBA Nucleus'))+
@@ -64,22 +90,25 @@ ggplot(data=df_60, mapping=aes(x=time))+
   scale_color_manual(values=c("blue","red","green",'yellow','black'))+
   guides(color=guide_legend(title="Component"))
 
+base |> filter(cell.id == "20") |>
+ggplot(mapping=aes(x=time))+
+  ggtitle("TNFa over time")+
+  geom_line(aes(y=eTNFa,color="eTNFa"))+
+  geom_line(aes(y=iTNFa, color='iTNFa'))+
+  geom_line(aes(y=TNFa.m,color="TNF mRNA"))+
+  geom_line(aes(y=TNFR, color="TNFR"))+
+  geom_line(aes(y=TNFa_TNFR, color="TNFa|TNFR"))+
+  geom_line(aes(y=TNFR.i, color="internal TNFR"))+
+  scale_color_manual(values=c("blue","red","green",'yellow','black','purple'))+
+  guides(color=guide_legend(title="Component"))
 
 ### maximum NFKB
-all_cells <- read.csv("model_base/logger_2.csv", header = TRUE, dec = '.', sep = "\t")
-all_cells <- as_tibble(all_cells)
-
-by_cellid <- all_cells |> group_by(cell.id)
-
-maxima <- by_cellid |> slice_max(NFKB.n) |> select(time, NFKB.n, dist)
-
-maximum <- ggplot(data=maxima, mapping=aes(x=dist))+
+df |> group_by(cell.id) |> slice_max(NFKB.n) |> select(time, NFKB.n, tmax) |>
+ggplot(mapping=aes(x=tmax))+
   ggtitle("NFKB Maxima")+
   geom_point(aes(y=time, color=NFKB.n))+
   scale_colour_gradient(high="#FF0000", low = "#0000FF")
 
-plot(maximum)
-print(all_cells)
 
 ###maximum TNFa
 
@@ -91,8 +120,9 @@ ggplot(data=maxima_tnf, mapping=aes(x=dist))+
   scale_colour_gradient(high="#FF0000", low = "#0000FF")
 
 ## all cells plotted
-ggplot(all_cells, mapping=aes(x=time, y=NFKB.n, group=cell.id,
-                              colour=dist))+
+df |> group_by(cell.id) |>
+ggplot(mapping=aes(x=time, y=NFKB.n, group=cell.id,
+                              colour=tmax))+
   geom_line()+
   scale_colour_gradient(high="#FF0000", low = "#0000FF")+
-  geom_vline(xintercept=10)
+  geom_vline(xintercept=0)

@@ -62,6 +62,7 @@
                 <Symbol symbol-ref="TNFR"/>
                 <Symbol symbol-ref="TNFa_TNFR"/>
                 <Symbol symbol-ref="TNFR.i"/>
+                <Symbol symbol-ref="tmax"/>
             </Input>
             <Output>
                 <TextOutput file-format="csv"/>
@@ -69,74 +70,6 @@
             <Restriction>
                 <Celltype celltype="macrophage"/>
             </Restriction>
-            <Plots>
-                <Plot time-step="-1">
-                    <Style style="lines" line-width="2" point-size="0.5"/>
-                    <Terminal terminal="png"/>
-                    <X-axis>
-                        <Symbol symbol-ref="time"/>
-                    </X-axis>
-                    <Y-axis>
-                        <Symbol symbol-ref="total_NFKB"/>
-                        <Symbol symbol-ref="NFKB"/>
-                        <Symbol symbol-ref="NFKB.n"/>
-                        <Symbol symbol-ref="IKK_NFKB_IKBA"/>
-                        <Symbol symbol-ref="NFKB_IKBA"/>
-                        <Symbol symbol-ref="NFKB_IKBA.n"/>
-                    </Y-axis>
-                </Plot>
-                <Plot time-step="-1">
-                    <Style style="lines"/>
-                    <Terminal terminal="png"/>
-                    <X-axis>
-                        <Symbol symbol-ref="time"/>
-                    </X-axis>
-                    <Y-axis>
-                        <Symbol symbol-ref="IKK"/>
-                        <Symbol symbol-ref="IKK_IKBA"/>
-                        <Symbol symbol-ref="IKK_NFKB_IKBA"/>
-                        <!--    <Disabled>
-        <Symbol symbol-ref="total_IKK"/>
-    </Disabled>
--->
-                        <!--    <Disabled>
-        <Symbol symbol-ref="IKKconc"/>
-    </Disabled>
--->
-                        <Symbol symbol-ref="IKK_sum"/>
-                    </Y-axis>
-                </Plot>
-                <!--    <Disabled>
-        <Plot time-step="-1">
-            <Style style="lines" line-width="2"/>
-            <Terminal terminal="png"/>
-            <X-axis>
-                <Symbol symbol-ref="time"/>
-            </X-axis>
-            <Y-axis>
-                <Symbol symbol-ref="IKK_sum"/>
-                <Symbol symbol-ref="total_IKK"/>
-            </Y-axis>
-        </Plot>
-    </Disabled>
--->
-                <Plot time-step="-1">
-                    <Style style="lines" line-width="2"/>
-                    <Terminal terminal="png"/>
-                    <X-axis>
-                        <Symbol symbol-ref="time"/>
-                    </X-axis>
-                    <Y-axis>
-                        <Symbol symbol-ref="IKBA"/>
-                        <Symbol symbol-ref="IKBA.m"/>
-                        <Symbol symbol-ref="IKBA.n"/>
-                        <Symbol symbol-ref="IKK_IKBA"/>
-                        <Symbol symbol-ref="IKK_NFKB_IKBA"/>
-                        <Symbol symbol-ref="NFKB_IKBA"/>
-                        <Symbol symbol-ref="NFKB_IKBA.n"/>
-                    </Y-axis>
-                </Plot>
-            </Plots>
         </Logger>
         <Gnuplotter time-step="10.0">
             <Plot>
@@ -552,8 +485,8 @@
     </Disabled>
 -->
             <!--    <Disabled>
-        <InitProperty symbol-ref="tmax">
-            <Expression>0.01*rand_norm(1,0.3)</Expression>
+        <InitProperty symbol-ref="NFKB">
+            <Expression>1.0</Expression>
         </InitProperty>
     </Disabled>
 -->
