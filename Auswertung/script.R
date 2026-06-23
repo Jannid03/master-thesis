@@ -8,10 +8,7 @@ library(EnvStats)
 ### Preparation
 setwd("D:/Uni/Masterarbeit/data")
 file_xml <- read_xml("model_base.xml")
-# 
-# name <- xml_find_all(file_xml,".//CellTypes//System//Constant//@symbol")
-# value <- xml_find_all(file_xml,".//CellTypes//System//Constant//@value")
-# parameters <- data.frame(name = xml_text(name), value=xml_text(value))
+
 
 parameter = "a1"
 path <- paste("//CellTypes//System//Constant[@symbol=","\"",parameter,"\"]",sep = "")
