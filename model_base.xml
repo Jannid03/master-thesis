@@ -30,6 +30,7 @@
                 <Symbol symbol-ref="cell.center.x"/>
                 <Symbol symbol-ref="cell.center.y"/>
                 <Symbol symbol-ref="cell.surface"/>
+                <Symbol symbol-ref="dist"/>
             </Input>
             <Output>
                 <TextOutput file-format="csv"/>
@@ -47,15 +48,20 @@
                 <Symbol symbol-ref="IKK_IKBA"/>
                 <Symbol symbol-ref="IKK_NFKB_IKBA"/>
                 <Symbol symbol-ref="total_IKK"/>
-                <Symbol symbol-ref="IKK_sum"/>
                 <Symbol symbol-ref="NFKB"/>
                 <Symbol symbol-ref="NFKB.n"/>
                 <Symbol symbol-ref="NFKB_IKBA"/>
                 <Symbol symbol-ref="NFKB_IKBA.n"/>
                 <Symbol symbol-ref="total_NFKB"/>
-                <Symbol symbol-ref="TNFaflux"/>
-                <Symbol symbol-ref="eTNFa"/>
+                <Symbol symbol-ref="stimulus"/>
                 <Symbol symbol-ref="LPS"/>
+                <Symbol symbol-ref="TNFa.m"/>
+                <Symbol symbol-ref="eTNFa"/>
+                <Symbol symbol-ref="iTNFa"/>
+                <Symbol symbol-ref="TNFaflux"/>
+                <Symbol symbol-ref="TNFR"/>
+                <Symbol symbol-ref="TNFa_TNFR"/>
+                <Symbol symbol-ref="TNFR.i"/>
             </Input>
             <Output>
                 <TextOutput file-format="csv"/>
@@ -171,9 +177,6 @@
             </Output>
             <Restriction>
                 <Celltype celltype="macrophage"/>
-                <!--    <Disabled>
-        <Cells cell-ids="2"/>
-    </Disabled>
             </Restriction>
             <Plots>
                 <Plot time-step="-1">
@@ -202,47 +205,41 @@
                         <Symbol symbol-ref="dist"/>
                     </Color-bar>
                 </Plot>
-                <!--    <Disabled>
-        <Plot time-step="-1">
-            <Style style="points"/>
-            <Terminal terminal="png"/>
-            <X-axis>
-                <Symbol symbol-ref="dist"/>
-            </X-axis>
-            <Y-axis>
-                <Symbol symbol-ref="NFKB.n"/>
-            </Y-axis>
-            <Range>
-                <Time mode="current"/>
-            </Range>
-            <Color-bar>
-                <Symbol symbol-ref="tmax"/>
-            </Color-bar>
-        </Plot>
-    </Disabled>
--->
-                <!--    <Disabled>
-        <Plot time-step="-1">
-            <Style style="points"/>
-            <Terminal terminal="png"/>
-            <X-axis>
-                <Symbol symbol-ref="tmax"/>
-            </X-axis>
-            <Y-axis>
-                <Symbol symbol-ref="eTNFa"/>
-            </Y-axis>
-            <Range>
-                <Time mode="current"/>
-            </Range>
-            <Color-bar>
-                <Symbol symbol-ref="dist"/>
-            </Color-bar>
-        </Plot>
-    </Disabled>
-
+                <Plot time-step="-1">
+                    <Style style="points"/>
+                    <Terminal terminal="png"/>
+                    <X-axis>
+                        <Symbol symbol-ref="dist"/>
+                    </X-axis>
+                    <Y-axis>
+                        <Symbol symbol-ref="NFKB.n"/>
+                    </Y-axis>
+                    <Range>
+                        <Time mode="current"/>
+                    </Range>
+                    <Color-bar>
+                        <Symbol symbol-ref="tmax"/>
+                    </Color-bar>
+                </Plot>
+                <Plot time-step="-1">
+                    <Style style="points"/>
+                    <Terminal terminal="png"/>
+                    <X-axis>
+                        <Symbol symbol-ref="tmax"/>
+                    </X-axis>
+                    <Y-axis>
+                        <Symbol symbol-ref="eTNFa"/>
+                    </Y-axis>
+                    <Range>
+                        <Time mode="current"/>
+                    </Range>
+                    <Color-bar>
+                        <Symbol symbol-ref="dist"/>
+                    </Color-bar>
+                </Plot>
             </Plots>
         </Logger> -->
-        <Logger time-step="1.0">
+        <!-- <Logger time-step="1.0">
             <Input>
                 <Symbol symbol-ref="eTNFa"/>
                 <Symbol symbol-ref="TNFaflux"/>
@@ -254,39 +251,27 @@
             <Restriction>
                 <Celltype celltype="macrophage"/>
             </Restriction>
-        </Logger>
-        <Logger time-step="1.0">
+        </Logger> -->
+        <!--<Logger time-step="1.0">
             <Input>
                 <Symbol symbol-ref="flux_in_medium"/>
-                <!--    <Disabled>
-        <Symbol symbol-ref="tmax"/>
-    </Disabled>
--->
-                <!--    <Disabled>
-        <Symbol symbol-ref="eTNFa"/>
-    </Disabled>
--->
+                <Symbol symbol-ref="tmax"/>
+                <Symbol symbol-ref="eTNFa"/>
             </Input>
             <Output>
                 <TextOutput/>
             </Output>
-            <!--    <Disabled>
-        <Restriction>
-            <Celltype celltype="macrophage"/>
-        </Restriction>
-    </Disabled>
--->
-        </Logger>
-        <!--    <Disabled>
-        <Gnuplotter time-step="-1.0">
+            <Restriction>
+              <Celltype celltype="macrophage"/>
+            </Restriction>
+        </Logger> -->
+        <!--<Gnuplotter time-step="-1.0">
             <Plot>
                 <Cells value="dist"/>
             </Plot>
             <Terminal name="png"/>
-        </Gnuplotter>
-    </Disabled>
--->
-        <Logger time-step="1.0">
+        </Gnuplotter> -->
+        <!-- <Logger time-step="1.0">
             <Input>
                 <Symbol symbol-ref="IKBA"/>
                 <Symbol symbol-ref="IKBA.m"/>
@@ -295,10 +280,7 @@
                 <Symbol symbol-ref="IKK_IKBA"/>
                 <Symbol symbol-ref="IKK_NFKB_IKBA"/>
                 <Symbol symbol-ref="total_IKK"/>
-                <!--    <Disabled>
-        <Symbol symbol-ref="IKKconc"/>
-    </Disabled>
--->
+                <Symbol symbol-ref="IKKconc"/>
                 <Symbol symbol-ref="IKK_sum"/>
                 <Symbol symbol-ref="NFKB"/>
                 <Symbol symbol-ref="NFKB.n"/>
@@ -316,10 +298,7 @@
                 <TextOutput file-format="csv"/>
             </Output>
             <Restriction>
-                <!--    <Disabled>
-        <Celltype celltype="cells"/>
-    </Disabled>
--->
+                <Celltype celltype="cells"/>
                 <Cells cell-ids="17"/>
             </Restriction>
             <Plots>
@@ -348,31 +327,22 @@
                         <Symbol symbol-ref="IKK"/>
                         <Symbol symbol-ref="IKK_IKBA"/>
                         <Symbol symbol-ref="IKK_NFKB_IKBA"/>
-                        <!--    <Disabled>
-        <Symbol symbol-ref="total_IKK"/>
-    </Disabled>
--->
-                        <!--    <Disabled>
-        <Symbol symbol-ref="IKKconc"/>
-    </Disabled>
--->
+                        <Symbol symbol-ref="total_IKK"/>
+                        <Symbol symbol-ref="IKKconc"/>
                         <Symbol symbol-ref="IKK_sum"/>
                     </Y-axis>
                 </Plot>
-                <!--    <Disabled>
-        <Plot time-step="-1">
-            <Style style="lines" line-width="2"/>
-            <Terminal terminal="png"/>
-            <X-axis>
-                <Symbol symbol-ref="time"/>
-            </X-axis>
-            <Y-axis>
-                <Symbol symbol-ref="IKK_sum"/>
-                <Symbol symbol-ref="total_IKK"/>
-            </Y-axis>
-        </Plot>
-    </Disabled>
--->
+                <Plot time-step="-1">
+                    <Style style="lines" line-width="2"/>
+                    <Terminal terminal="png"/>
+                    <X-axis>
+                        <Symbol symbol-ref="time"/>
+                    </X-axis>
+                    <Y-axis>
+                        <Symbol symbol-ref="IKK_sum"/>
+                        <Symbol symbol-ref="total_IKK"/>
+                    </Y-axis>
+                </Plot>
                 <Plot time-step="-1">
                     <Style style="lines" line-width="2"/>
                     <Terminal terminal="png"/>
@@ -390,7 +360,7 @@
                     </Y-axis>
                 </Plot>
             </Plots>
-        </Logger>
+        </Logger> -->
     </Analysis>
     <CellTypes>
         <CellType name="macrophage" class="biological">
@@ -457,7 +427,7 @@
                 <Rule symbol-ref="total_NFKB">
                     <Expression>NFKB+NFKB.n+IKK_NFKB_IKBA+NFKB_IKBA+NFKB_IKBA.n</Expression>
                 </Rule>
-                <Rule symbol-ref="IKK_sum">
+                <Rule symbol-ref="total_IKK">
                     <Expression>IKK+IKK_IKBA+IKK_NFKB_IKBA</Expression>
                 </Rule>
                 <!--    <Disabled>
@@ -503,7 +473,7 @@
             <Property symbol="IKBA.n" name="nucleus IKBA" tags="nucleus" value="0.0"/>
             <Property symbol="IKBA.m" name="IKBA mRNA" tags="nucleus" value="0.0"/>
             <Property symbol="total_NFKB" value="NFKB+NFKB.n+IKK_NFKB_IKBA+NFKB_IKBA+NFKB_IKBA.n"/>
-            <Property symbol="total_IKK" value="0"/>
+            <Property symbol="total_IKK" value="IKK+IKK_IKBA+IKK_NFKB_IKBA"/>
             <Property symbol="IKKconc" value="0.00075"/>
             <Property symbol="IKK_sum" value="0.0"/>
             <Property symbol="LPS" value="0.0"/>
