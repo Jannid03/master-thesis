@@ -1,0 +1,26 @@
+{
+    "id": "4F7EC375",
+    "path": "D:/Uni/Masterarbeit/data/model_base.xml",
+    "project_path": null,
+    "type": "xml",
+    "hash": "918098537",
+    "contents": "",
+    "dirty": false,
+    "created": 1781632353485.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "396,36",
+        "scrollLine": "389"
+    },
+    "folds": "2|17|5|4|\n6|11|18|4|\n19|10|24|4|\n25|14|392|4|\n132|37|152|8|\n393|15|566|4|\n567|21|589|4|\n590|9|607|4|\n",
+    "lastKnownWriteTime": 1782203977,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1782205777516,
+    "read_only": false,
+    "read_only_alternatives": []
+}
