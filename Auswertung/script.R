@@ -28,7 +28,7 @@ for (i in 1:n) {
   ## File Output
   command <- paste("py ausfuehren.py ", paste(dir,"/model.xml",sep=""), " ",dir)
   command <- sprintf(command)
-  system(command)
+  output <- system(command)
 }
 
 df <- read.csv("runs/a1/a1=1.35/logger_1.csv", header = TRUE, dec = '.', sep = "\t")
