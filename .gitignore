@@ -1,0 +1,9 @@
+.Rproj.user/
+*.Rproj
+.Rhistory
+.RData
+.Ruserdata
+base
+model_base
+model_base2
+runs
