@@ -24,3 +24,21 @@ setup <- function() {
   
   print("Setup done")
 }
+
+init <- function(parameter="tmax") {
+  parameter = parameter
+  path <- paste("//CellTypes//Property[@symbol=","\"",parameter,"\"]",sep = "")
+  value <- xml_double(xml_find_all(file_xml,paste(path, "//@value")))
+  output <- paste("runs/",parameter,sep="")
+  
+  
+  expr <- make_expression(1)
+  
+  expr_path <- (xml_find_first(file_xml,"//CellPopulations//Population"))
+  xml_add_child(expr_path,"InitProperty")
+  xml_set_attr(xml_find_first(file_xml, "//CellPopulations//Population//InitProperty"), "symbol-ref",parameter)
+  xml_add_child(xml_find_first(file_xml, "//CellPopulations//Population//InitProperty"),"Expression",expr)
+  
+  
+  print("Init done")
+}
