@@ -1,0 +1,10 @@
+make_expression <- function(i) {
+  if (i == 36){
+    return (paste("if(cell.id==36,",rnormTrunc(1,value,sd=1,min=0),",",value,")",sep=''))
+  }
+  else {
+    expression <- "if(cell.id=="
+    expression <- paste(expression,i,",",rnormTrunc(1,value,sd=1,min=0),",",make_expression(i+1),")",sep='')
+    return (expression)
+  }
+}
