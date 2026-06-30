@@ -8,3 +8,19 @@ make_expression <- function(i) {
     return (expression)
   }
 }
+
+
+setup <- function() {
+  library(ggplot2)
+  library(dplyr)
+  library(tidyr)
+  library(xml2)
+  library(XML)
+  library(EnvStats)
+  
+  ### Preparation
+  setwd("D:/Uni/Masterarbeit/data")
+  file_xml <- read_xml("model_base.xml")
+  
+  print("Setup done")
+}

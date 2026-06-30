@@ -1,13 +1,5 @@
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(xml2)
-library(XML)
-library(EnvStats)
-
-### Preparation
-setwd("D:/Uni/Masterarbeit/data")
-file_xml <- read_xml("model_base.xml")
+source("functions.R")
+setup()
 
 
 parameter = "tmax"
@@ -16,7 +8,7 @@ value <- xml_double(xml_find_all(file_xml,paste(path, "//@value")))
 n <- 1
 output <- paste("runs/",parameter,sep="")
 
-source("functions.R")
+
 expr <- make_expression(1)
 
 expr_path <- (xml_find_first(file_xml,"//CellPopulations//Population"))
