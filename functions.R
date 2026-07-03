@@ -57,7 +57,7 @@ standard_plots <- function(df) {
     geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
-  ggsave(filename="cell_20_NFKB.png",path = output, scale=3)
+  ggsave(filename="cell_20_NFKB.png",path = output, width=3000, height=2000, units="px")
   
   df |> filter(cell.id == "20") |>
     ggplot(mapping=aes(x=time))+
@@ -71,7 +71,7 @@ standard_plots <- function(df) {
     geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
-  ggsave(filename="cell_20_IKK.png",path = output, scale=3)
+  ggsave(filename="cell_20_IKK.png",path = output, width=3000, height=2000, units="px")
   
   df |> filter(cell.id == "20") |>
     ggplot(mapping=aes(x=time))+
@@ -86,7 +86,7 @@ standard_plots <- function(df) {
     geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
-  ggsave(filename="cell_20_IKBA.png",path = output, scale=3)
+  ggsave(filename="cell_20_IKBA.png",path = output, width=3000, height=2000, units="px")
   
   
   df |> filter(cell.id == "20") |>
@@ -103,5 +103,5 @@ standard_plots <- function(df) {
     geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
-  ggsave(filename="cell_20_TNFa.png",path = output, scale=3)
+  ggsave(filename="cell_20_TNFa.png",path = output, width=3000, height=2000, units="px")
 }

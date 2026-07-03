@@ -27,10 +27,10 @@ for (i in 1:n) {
 
 # base <- read.csv("base/logger_2.csv", header = TRUE, dec = '.', sep = "\t")
 
-df <- read.csv("runs/tmax/run_001/logger_2.csv", header = TRUE, dec = '.', sep = "\t")
+df <- read.csv("runs/tmax/run_002/logger_2.csv", header = TRUE, dec = '.', sep = "\t")
 df <- as_tibble(df)
 
-cell_pos <- read.csv("runs/tmax/run_001/logger_1.csv", header = TRUE, dec = '.', sep = "\t")
+cell_pos <- read.csv("runs/tmax/run_002/logger_1.csv", header = TRUE, dec = '.', sep = "\t")
 cell_pos <- as_tibble(cell_pos)
 
 cell_pos <- cell_pos |> group_by(time) |> mutate(new_dist = sqrt((cell.center.x-cell.center.x[20])^2+(cell.center.y-cell.center.y[20])^2))
@@ -39,8 +39,10 @@ df <- df |> mutate("dist" = cell_pos$dist)
 
 df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
 
-standard_plot(df)
+standard_plots(df)
 
+
+###### Extra Plots
 ### maximum NFKB
 df |> group_by(cell.id) |> slice_max(NFKB.n) |> select(time, NFKB.n, tmax) |>
 ggplot(mapping=aes(x=tmax))+
