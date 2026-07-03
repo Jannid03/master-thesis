@@ -6,10 +6,15 @@ init("tmax")
 
 n <- 1
 
+if (length(dir(output)) == 0) {
+  last <-0
+} else {
+  last <- as.numeric(substr(dir(output)[length(dir(output))],5,8))
+}
 
 for (i in 1:n) {
   # dir <- paste(output,"/",parameter,"=",round(mod_val,3),sep="")
-  output <- paste(output,"/run_",formatC(i,width=3,flag='0'),sep="")
+  output <- paste(output,"/run_",formatC(last+i,width=3,flag='0'),sep="")
   dir.create((output), recursive = TRUE)
   write_xml(file_xml, paste(output,"/model.xml",sep=""))
 
