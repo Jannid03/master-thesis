@@ -1,3 +1,4 @@
+setwd("D:/Uni/Masterarbeit/data")
 source("functions.R")
 setup()
 init("tmax")
@@ -27,68 +28,13 @@ df <- as_tibble(df)
 cell_pos <- read.csv("runs/tmax/run_001/logger_1.csv", header = TRUE, dec = '.', sep = "\t")
 cell_pos <- as_tibble(cell_pos)
 
+cell_pos <- cell_pos |> group_by(time) |> mutate(new_dist = sqrt((cell.center.x-cell.center.x[20])^2+(cell.center.y-cell.center.y[20])^2))
+
+df <- df |> mutate("dist" = cell_pos$dist)
+
 df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
 
-df |> filter(cell.id == "20") |>
-ggplot(mapping=aes(x=time))+
-  ggtitle("NFKB over time")+
-  geom_line(aes(y=NFKB.n,color="NFKB.n"))+
-  geom_line(aes(y=NFKB, color='NFKB'))+
-  geom_line(aes(y=total_NFKB,color="Total NFKB"))+
-  geom_line(aes(y=NFKB_IKBA, color="NFKB|IKBA"))+
-  geom_line(aes(y=IKK_NFKB_IKBA, color="NFKB|IKK|IKBA"))+
-  scale_color_manual(values=c("blue","red","green",'yellow','black'))+
-  guides(color=guide_legend(title="Component"))+
-  geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
-  geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
-
-ggsave(filename="cell_20_NFKB.png",path = output, scale=3)
-
-df |> filter(cell.id == "20") |>
-ggplot(mapping=aes(x=time))+
-  ggtitle("IKK over time")+
-  geom_line(aes(y=IKK,color="IKK"))+
-  geom_line(aes(y=total_IKK,color="Total IKK"))+
-  geom_line(aes(y=IKK_IKBA, color="IKK|IKBA"))+
-  geom_line(aes(y=IKK_NFKB_IKBA, color="NFKB|IKK|IKBA"))+
-  scale_color_manual(values=c("blue","red","green",'yellow'))+
-  guides(color=guide_legend(title="Component"))+
-  geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
-  geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
-
-ggsave(filename="cell_20_IKK.png",path = output, scale=3)
-
-df |> filter(cell.id == "20") |>
-ggplot(mapping=aes(x=time))+
-  ggtitle("IKBA over time")+
-  geom_line(aes(y=IKBA.m,color="IKBA mRNA"))+
-  geom_line(aes(y=IKBA.n, color='IKBA Nucleus'))+
-  geom_line(aes(y=IKBA,color="IKBA"))+
-  geom_line(aes(y=NFKB_IKBA, color="NFKB|IKBA"))+
-  geom_line(aes(y=IKK_NFKB_IKBA, color="NFKB|IKK|IKBA"))+
-  scale_color_manual(values=c("blue","red","green",'yellow','black'))+
-  guides(color=guide_legend(title="Component"))+
-  geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
-  geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
-
-ggsave(filename="cell_20_IKBA.png",path = output, scale=3)
-
-
-df |> filter(cell.id == "20") |>
-ggplot(mapping=aes(x=time))+
-  ggtitle("TNFa over time")+
-  geom_line(aes(y=eTNFa,color="eTNFa"))+
-  geom_line(aes(y=iTNFa, color='iTNFa'))+
-  geom_line(aes(y=TNFa.m,color="TNF mRNA"))+
-  geom_line(aes(y=TNFR, color="TNFR"))+
-  geom_line(aes(y=TNFa_TNFR, color="TNFa|TNFR"))+
-  geom_line(aes(y=TNFR.i, color="internal TNFR"))+
-  scale_color_manual(values=c("blue","red","green",'yellow','black','purple'))+
-  guides(color=guide_legend(title="Component"))+
-  geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
-  geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
-
-ggsave(filename="cell_20_TNFa.png",path = output, scale=3)
+standard_plot(df)
 
 ### maximum NFKB
 df |> group_by(cell.id) |> slice_max(NFKB.n) |> select(time, NFKB.n, tmax) |>
