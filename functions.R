@@ -109,3 +109,26 @@ standard_plots <- function(df) {
   
   ggsave(filename="cell_20_TNFa.png",path = output, width=3000, height=2000, units="px")
 }
+
+run <- function(n=1) {
+  
+  if (length(dir(output)) == 0) {
+    last <-0
+  } else {
+    last <- as.numeric(substr(dir(output)[length(dir(output))],5,8))
+  }
+  
+  for (i in 1:n) {
+    # dir <- paste(output,"/",parameter,"=",round(mod_val,3),sep="")
+    output <- paste(output,"/run_",formatC(last+i,width=3,flag='0'),sep="")
+    dir.create((output), recursive = TRUE)
+    write_xml(file_xml, paste(output,"/model.xml",sep=""))
+    
+    
+    ## File Output
+    command <- paste("py ausfuehren.py ", paste(output,"/model.xml",sep=""), " ",output)
+    command <- sprintf(command)
+    command_output <- system(command, intern = TRUE)
+    write(command_output, paste(output,"/output.txt",sep=""))
+  }
+}

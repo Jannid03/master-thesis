@@ -2,28 +2,8 @@ setwd("D:/Uni/Masterarbeit/data")
 source("functions.R")
 setup()
 init("tmax",12)
+run(1)
 
-
-n <- 1
-
-if (length(dir(output)) == 0) {
-  last <-0
-} else {
-  last <- as.numeric(substr(dir(output)[length(dir(output))],5,8))
-}
-
-for (i in 1:n) {
-  # dir <- paste(output,"/",parameter,"=",round(mod_val,3),sep="")
-  output <- paste(output,"/run_",formatC(last+i,width=3,flag='0'),sep="")
-  dir.create((output), recursive = TRUE)
-  write_xml(file_xml, paste(output,"/model.xml",sep=""))
-
-  
-  ## File Output
-  command <- paste("py ausfuehren.py ", paste(output,"/model.xml",sep=""), " ",output)
-  command <- sprintf(command)
-  system(command)
-}
 
 # base <- read.csv("base/logger_2.csv", header = TRUE, dec = '.', sep = "\t")
 
