@@ -1,7 +1,7 @@
 setwd("D:/Uni/Masterarbeit/data")
 source("functions.R")
 setup()
-init("tmax")
+init("tmax",12)
 
 
 n <- 1

@@ -24,13 +24,14 @@ setup <- function() {
   print("Setup done")
 }
 
-init <- function(parameter="tmax") {
+init <- function(parameter="tmax", seed = "42") {
   parameter <<- parameter
   path <<- paste("//CellTypes//Property[@symbol=","\"",parameter,"\"]",sep = "")
   value <<- xml_double(xml_find_all(file_xml,paste(path, "//@value")))
   output <<- paste("runs/",parameter,sep="")
   
   
+  ### Cells
   expr <- make_expression(1)
   
   expr_path <<- (xml_find_first(file_xml,"//CellPopulations//Population"))
@@ -38,6 +39,9 @@ init <- function(parameter="tmax") {
   xml_set_attr(xml_find_first(file_xml, "//CellPopulations//Population//InitProperty"), "symbol-ref",parameter)
   xml_add_child(xml_find_first(file_xml, "//CellPopulations//Population//InitProperty"),"Expression",expr)
   
+  
+  ###Seed
+  xml_set_attr(xml_find_first(file_xml, "//Time//RandomSeed"), "value",seed)
   
   print("Init done")
 }
