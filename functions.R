@@ -1,10 +1,12 @@
 make_expression <- function(i) {
   if (i == 36){
-    return (paste("if(cell.id==36,",rnormTrunc(1,value,sd=1,min=0),",",value,")",sep=''))
+    return (paste("if(cell.id==36,",rlnorm(1,log(value^2/sqrt(value^2+sd^2)),log(1+(sd^2/value^2))),",",value,")",sep=''))
+  }
+  else if (i == 20){
+    return (paste("if(cell.id==20,",value,",",make_expression(i+1),")",sep=''))
   }
   else {
-    expression <- "if(cell.id=="
-    expression <- paste(expression,i,",",rnormTrunc(1,value,sd=1,min=0),",",make_expression(i+1),")",sep='')
+    expression <- paste("if(cell.id==",i,",",rlnorm(1,log(value^2/sqrt(value^2+sd^2)),log(1+(sd^2/value^2))),",",make_expression(i+1),")",sep='')
     return (expression)
   }
 }
@@ -24,8 +26,9 @@ setup <- function() {
   print("Setup done")
 }
 
-init <- function(parameter="tmax", seed = "42") {
+init <- function(parameter="tmax", seed = "42", sd=1) {
   parameter <<- parameter
+  sd <<- sd
   path <<- paste("//CellTypes//Property[@symbol=","\"",parameter,"\"]",sep = "")
   value <<- xml_double(xml_find_all(file_xml,paste(path, "//@value")))
   output <<- paste("runs/",parameter,sep="")
@@ -47,7 +50,7 @@ init <- function(parameter="tmax", seed = "42") {
 }
 
 standard_plots <- function(df) {
-  save_path <- paste(output,"/",dir(output)[length(dir(output))],sep="")
+  save_path <<- paste(output,"/",dir(output)[length(dir(output))],sep="")
   df |> filter(cell.id == "20") |>
     ggplot(mapping=aes(x=time))+
     ggtitle("NFKB over time")+
@@ -131,4 +134,23 @@ run <- function(n=1) {
     command_output <- system(command, intern = TRUE)
     write(command_output, paste(output,"/output.txt",sep=""))
   }
+}
+
+load <- function(parameter="tmax", run=1) {
+  path <- paste("runs/",parameter,"/run_",formatC(run,width=3,flag='0'),sep='')
+  print(path)
+  
+  df <- read.csv(paste(path,"/logger_2.csv",sep=''), header = TRUE, dec = '.', sep = "\t")
+  df <- as_tibble(df)
+  
+  cell_pos <- read.csv(paste(path,"/logger_1.csv",sep=''), header = TRUE, dec = '.', sep = "\t")
+  cell_pos <- as_tibble(cell_pos)
+  
+  cell_pos <<- cell_pos |> group_by(time) |> mutate(new_dist = sqrt((cell.center.x-cell.center.x[20])^2+(cell.center.y-cell.center.y[20])^2))
+  
+  df <- df |> mutate("dist" = cell_pos$dist)
+  
+  # df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
+  
+  df <<- df |> mutate(activated_frac = TNFa_TNFR/(TNFa_TNFR+TNFR))
 }
