@@ -49,9 +49,9 @@ init <- function(parameter="tmax", seed = "42", sd=1) {
   print("Init done")
 }
 
-standard_plots <- function(df) {
+standard_plots <- function(df, cellid = 20) {
   save_path <<- paste(output,"/",dir(output)[length(dir(output))],sep="")
-  df |> filter(cell.id == "20") |>
+  df |> filter(cell.id == cellid) |>
     ggplot(mapping=aes(x=time))+
     ggtitle("NFKB over time")+
     geom_line(aes(y=NFKB.n,color="NFKB.n"))+
@@ -64,9 +64,9 @@ standard_plots <- function(df) {
     geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
-  ggsave(filename="cell_20_NFKB.png",path = save_path, width=3000, height=2000, units="px")
+  ggsave(filename=paste("cell_",cellid,"_NFKB.png",sep=''),path = save_path, width=3000, height=2000, units="px")
   
-  df |> filter(cell.id == "20") |>
+  df |> filter(cell.id == cellid) |>
     ggplot(mapping=aes(x=time))+
     ggtitle("IKK over time")+
     geom_line(aes(y=IKK,color="IKK"))+
@@ -78,9 +78,9 @@ standard_plots <- function(df) {
     geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
-  ggsave(filename="cell_20_IKK.png",path = save_path, width=3000, height=2000, units="px")
+  ggsave(filename=paste("cell_",cellid,"_IKK.png",sep=''),path = save_path, width=3000, height=2000, units="px")
   
-  df |> filter(cell.id == "20") |>
+  df |> filter(cell.id == cellid) |>
     ggplot(mapping=aes(x=time))+
     ggtitle("IKBA over time")+
     geom_line(aes(y=IKBA.m,color="IKBA mRNA"))+
@@ -93,10 +93,10 @@ standard_plots <- function(df) {
     geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
-  ggsave(filename="cell_20_IKBA.png",path = save_path, width=3000, height=2000, units="px")
+  ggsave(filename=paste("cell_",cellid,"_IKBA.png",sep=''),path = save_path, width=3000, height=2000, units="px")
   
   
-  df |> filter(cell.id == "20") |>
+  df |> filter(cell.id == cellid) |>
     ggplot(mapping=aes(x=time))+
     ggtitle("TNFa over time")+
     geom_line(aes(y=eTNFa,color="eTNFa"))+
@@ -110,7 +110,7 @@ standard_plots <- function(df) {
     geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
-  ggsave(filename="cell_20_TNFa.png",path = save_path, width=3000, height=2000, units="px")
+  ggsave(filename=paste("cell_",cellid,"_TNFa.png",sep=''),path = save_path, width=3000, height=2000, units="px")
 }
 
 run <- function(n=1) {
