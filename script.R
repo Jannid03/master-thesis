@@ -1,15 +1,18 @@
 setwd("D:/Uni/Masterarbeit/data")
 source("functions.R")
 setup()
+
+
+
 init("tmax",38,0.02) #12
 run(1)
 
 
 # base <- read.csv("base/logger_2.csv", header = TRUE, dec = '.', sep = "\t")
 
-load("tmax", 11)
+load()
 standard_plots(df)
-
+standard_plots(df,18)
 
 ###### Extra Plots
 ### maximum NFKB

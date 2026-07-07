@@ -49,8 +49,14 @@ init <- function(parameter="tmax", seed = "42", sd=1) {
   print("Init done")
 }
 
-standard_plots <- function(df, cellid = 20) {
-  save_path <<- paste(output,"/",dir(output)[length(dir(output))],sep="")
+standard_plots <- function(df, cellid = 20, param = "base", runn = -1) {
+  if (run == -1) {
+    save_path <<- paste(output,"/",dir(output)[length(dir(output))],sep="")
+  }
+  else {
+    save_path <<- paste("runs/",param,"/run_",formatC(runn,width=3,flag='0'),sep="")
+  }
+  
   df |> filter(cell.id == cellid) |>
     ggplot(mapping=aes(x=time))+
     ggtitle("NFKB over time")+
@@ -136,8 +142,14 @@ run <- function(n=1) {
   }
 }
 
-load <- function(parameter="tmax", run=1) {
-  path <- paste("runs/",parameter,"/run_",formatC(run,width=3,flag='0'),sep='')
+load <- function(parameter="base", run=-1) {
+  if (run == -1){
+    path <- save_path
+  }
+  else {
+    path <- paste("runs/",parameter,"/run_",formatC(run,width=3,flag='0'),sep='')
+  }
+  
   print(path)
   
   df <- read.csv(paste(path,"/logger_2.csv",sep=''), header = TRUE, dec = '.', sep = "\t")
