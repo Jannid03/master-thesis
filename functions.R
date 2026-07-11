@@ -50,7 +50,7 @@ init <- function(parameter="tmax", seed = "42", sd=1) {
 }
 
 standard_plots <- function(df, cellid = 20, param = "base", runn = -1) {
-  if (run == -1) {
+  if (runn == -1) {
     save_path <<- paste(output,"/",dir(output)[length(dir(output))],sep="")
   }
   else {
@@ -142,9 +142,9 @@ run <- function(n=1) {
   }
 }
 
-load <- function(parameter="base", run=-1) {
-  if (run == -1){
-    path <- save_path
+load <- function(parameter="base", runn=-1) {
+  if (runn == -1){
+    path <- paste(output,"/",dir(output)[length(dir(output))],sep="")
   }
   else {
     path <- paste("runs/",parameter,"/run_",formatC(run,width=3,flag='0'),sep='')
