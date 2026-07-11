@@ -4,7 +4,7 @@ setup()
 
 
 
-init("tmax",38,0.02) #12
+init("tmax",25,0.05) #12
 run(1)
 
 
@@ -12,7 +12,7 @@ run(1)
 
 load()
 standard_plots(df)
-standard_plots(df,18)
+standard_plots(df,35)
 
 ###### Extra Plots
 ### maximum NFKB
@@ -67,6 +67,34 @@ df |> group_by(cell.id) |>
   ggtitle("Fraction of activated TNF Receptors")
 
 ggsave(filename="all_cells_TNFR_frac.png",path = save_path, scale=3)
+
+### "Recovery time" of NFKB
+df |> group_by(cell.id) |> filter(time > 60) |> filter(NFKB.n < 1e-5) |> slice_min(time) |>
+  ggplot(mapping=aes(x=tmax))+
+  ggtitle("Timepoint when NFKB.n is back close to normal")+
+  geom_point(aes(y=time, color=dist))+
+  scale_colour_gradient(high="#FF0000", low = "#0000FF")
+
+ggsave(filename="NFKB_calm_down.png",path = save_path, scale=3)
+
+
+### When are receptors satisfied
+df |> group_by(cell.id) |> filter(activated_frac >= 0.95) |> slice_min(time) |>
+  ggplot(mapping=aes(x=tmax))+
+  ggtitle("Timepoint when TNF Receptors are fully satisfied")+
+  geom_point(aes(y=time, color=dist))+
+  scale_colour_gradient(high="#FF0000", low = "#0000FF")
+
+ggsave(filename="TNFR_fully_satisfied.png",path = save_path, scale=3)
+
+### When are receptors calmed down
+df |> group_by(cell.id) |> filter(time > 60) |> filter(activated_frac <= 0.05) |> slice_min(time) |>
+  ggplot(mapping=aes(x=tmax))+
+  ggtitle("Timepoint when TNF Receptors are back to normal")+
+  geom_point(aes(y=time, color=dist))+
+  scale_colour_gradient(high="#FF0000", low = "#0000FF")
+
+ggsave(filename="TNFR_calmed_down.png",path = save_path, scale=3)
 
 x <- seq(0,10,0.01)
 m<-0.01
