@@ -27,6 +27,7 @@ setup <- function() {
 }
 
 init <- function(parameter="tmax", seed = "42", sd=1) {
+  set.seed(seed)
   parameter <<- parameter
   sd <<- sd
   path <<- paste("//CellTypes//Property[@symbol=","\"",parameter,"\"]",sep = "")
