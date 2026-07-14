@@ -1,12 +1,12 @@
 make_expression <- function(i) {
   if (i == 36){
-    return (paste("if(cell.id==36,",rlnorm(1,log(value^2/sqrt(value^2+sd^2)),log(1+(sd^2/value^2))),",",value,")",sep=''))
+    return (paste("if(cell.id==36,",rlnorm(1,log(value),log(sd_s)),",",value,")",sep=''))
   }
   else if (i == 20){
     return (paste("if(cell.id==20,",value,",",make_expression(i+1),")",sep=''))
   }
   else {
-    expression <- paste("if(cell.id==",i,",",rlnorm(1,log(value^2/sqrt(value^2+sd^2)),log(1+(sd^2/value^2))),",",make_expression(i+1),")",sep='')
+    expression <- paste("if(cell.id==",i,",",rlnorm(1,log(value),log(sd_s)),",",make_expression(i+1),")",sep='')
     return (expression)
   }
 }
@@ -26,10 +26,10 @@ setup <- function() {
   print("Setup done")
 }
 
-init <- function(parameter="tmax", seed = "42", sd=1) {
+init <- function(parameter="tmax", seed = "42", sd_s=2) {
   set.seed(seed)
   parameter <<- parameter
-  sd <<- sd
+  sd_s <<- sd_s
   path <<- paste("//CellTypes//Property[@symbol=","\"",parameter,"\"]",sep = "")
   value <<- xml_double(xml_find_all(file_xml,paste(path, "//@value")))
   output <<- paste("runs/",parameter,sep="")
@@ -165,5 +165,5 @@ load <- function(parameter="base", runn=-1) {
   
   # df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
   
-  df <<- df |> mutate(activated_frac = TNFa_TNFR/(TNFa_TNFR+TNFR))
+  value_df <<- df |> mutate(activated_frac = TNFa_TNFR/(TNFa_TNFR+TNFR))
 }
