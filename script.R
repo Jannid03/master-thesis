@@ -4,7 +4,7 @@ setup()
 
 
 
-init("tmax",8236,2) #12
+init("tmax",7364,5) #12
 run(1)
 
 
@@ -96,6 +96,13 @@ value_df |> group_by(cell.id) |> filter(time > 60) |> filter(activated_frac <= 0
 
 ggsave(filename="TNFR_calmed_down.png",path = save_path, scale=3)
 
+
+##Kyrogram
+value_df |> group_by(cell.id) |>
+  ggplot(mapping=aes(x=cell.id,y=time))+
+  geom_bar(stat="identity", aes(color=eTNFa))+
+  scale_colour_gradient(high="#FF0000", low = "#0000FF")+
+  coord_flip()
 
 # value_df |> group_by(cell.id) |> filter(time == 800) |>
 #   ggplot(mapping=aes(x=eTNFa))+
