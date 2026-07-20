@@ -4,7 +4,7 @@ setup()
 
 
 
-init("tmax",7364,5) #12
+init("tmax",6257,2.2) #12
 run(1)
 
 
@@ -16,20 +16,25 @@ standard_plots(value_df,22)
 
 ###### Extra Plots
 ### maximum NFKB
+co <- lm(time ~ log(tmax), as.data.frame(value_df |> group_by(cell.id) |> slice_max(NFKB.n) |> select(time, NFKB.n, tmax)))$coefficients
+
 value_df |> group_by(cell.id) |> slice_max(NFKB.n) |> select(time, NFKB.n, tmax) |>
 ggplot(mapping=aes(x=log(tmax)))+
   ggtitle("NFKB Maxima")+
   geom_point(aes(y=time, color=NFKB.n))+
+  geom_line(mapping=aes(y=co[1]+co[2]*log(tmax)), alpha=0.5, linetype="dashed")+
   scale_colour_gradient(high="#FF0000", low = "#0000FF")
 
 ggsave(filename="maximum_NFKB.png",path = save_path, scale=3)
 
 ###maximum TNFa
+co <- lm(time ~ log(tmax), as.data.frame(value_df |> group_by(cell.id) |> slice_max(eTNFa) |> select(eTNFa, time,tmax)))$coefficients
 
 value_df |> group_by(cell.id) |> slice_max(eTNFa) |> select(eTNFa, time,tmax) |>
 ggplot(mapping=aes(x=log(tmax)))+
   ggtitle("TNFa Maxima")+
   geom_point(aes(y=time, color=eTNFa))+
+  geom_line(mapping=aes(y=co[1]+co[2]*log(tmax)), alpha=0.5, linetype="dashed")+
   scale_colour_gradient(high="#FF0000", low = "#0000FF")
 
 ggsave(filename="maximum_TNFa.png",path = save_path, scale=3)
@@ -69,32 +74,43 @@ value_df |> group_by(cell.id) |>
 ggsave(filename="all_cells_TNFR_frac.png",path = save_path, scale=3)
 
 ### "Recovery time" of NFKB
-value_df |> group_by(cell.id) |> filter(time > 60) |> filter(NFKB.n < 1e-5) |> slice_min(time) |>
+co <- lm(time ~ log(tmax), as.data.frame(value_df |> group_by(cell.id) |> filter(time > 100) |> filter(NFKB.n < 1e-5) |> slice_min(time)))$coefficients
+
+value_df |> group_by(cell.id) |> filter(time > 100) |> filter(NFKB.n < 1e-5) |> slice_min(time) |>
   ggplot(mapping=aes(x=log(tmax)))+
   ggtitle("Timepoint when NFKB.n is back close to normal")+
   geom_point(aes(y=time, color=dist))+
+  geom_line(mapping=aes(y=co[1]+co[2]*log(tmax)), alpha=0.5, linetype="dashed")+
   scale_colour_gradient(high="#FF0000", low = "#0000FF")
 
 ggsave(filename="NFKB_calm_down.png",path = save_path, scale=3)
 
 
 ### When are receptors satisfied
+co <- lm(time ~ log(tmax), as.data.frame(value_df |> group_by(cell.id) |> filter(activated_frac >= 0.95) |> slice_min(time)))$coefficients
+
 value_df |> group_by(cell.id) |> filter(activated_frac >= 0.95) |> slice_min(time) |>
   ggplot(mapping=aes(x=log(tmax)))+
   ggtitle("Timepoint when TNF Receptors are fully satisfied")+
   geom_point(aes(y=time, color=dist))+
+  geom_line(mapping=aes(y=co[1]+co[2]*log(tmax)), alpha=0.5, linetype="dashed")+
   scale_colour_gradient(high="#FF0000", low = "#0000FF")
 
 ggsave(filename="TNFR_fully_satisfied.png",path = save_path, scale=3)
 
 ### When are receptors calmed down
-value_df |> group_by(cell.id) |> filter(time > 60) |> filter(activated_frac <= 0.05) |> slice_min(time) |>
+co <- lm(time ~ log(tmax), as.data.frame(value_df |> group_by(cell.id) |> filter(time > 250) |> filter(activated_frac <= 0.05) |> slice_min(time)))$coefficients
+
+value_df |> group_by(cell.id) |> filter(time > 250) |> filter(activated_frac <= 0.05) |> slice_min(time) |>
   ggplot(mapping=aes(x=log(tmax)))+
   ggtitle("Timepoint when TNF Receptors are back to normal")+
   geom_point(aes(y=time, color=dist))+
+  geom_line(mapping=aes(y=co[1]+co[2]*log(tmax)), alpha=0.5, linetype="dashed")+
   scale_colour_gradient(high="#FF0000", low = "#0000FF")
 
 ggsave(filename="TNFR_calmed_down.png",path = save_path, scale=3)
+
+
 
 
 ##Kymograph for eTNFa
@@ -114,6 +130,50 @@ value_df |> group_by(cell.id) |>
   coord_flip()
 
 ggsave(filename="kymograph_NFKB.png",path = save_path, scale=3)
+
+###ROCS
+##NFKB
+roc_val_nfkb <- rocs(value_df)
+
+#Dist
+value_df |> group_by(cell.id) |> filter(time==1) |>
+  ggplot(mapping=aes(x=log(tmax)))+
+  geom_point(aes(y=roc_val_nfkb, color=dist))+
+  scale_colour_gradient(high="#FF0000", low = "#0000FF")+
+  ggtitle("AUC for NFKB.n")
+
+ggsave(filename="AUC_NFKB.png",path = save_path, scale=3)
+
+# Order
+value_df |> group_by(cell.id) |> filter(time==1) |>
+  ggplot(mapping=aes(x=log(tmax)))+
+  geom_point(aes(y=roc_val_nfkb, color=as.factor(cellorder)))+
+  ggtitle("AUC for NFKB.n")
+
+ggsave(filename="AUC_NFKB_order.png",path = save_path, scale=3)
+
+##eTNFa
+roc_val_eTNFa <- rocs(value_df, "eTNFa")
+
+#Dist
+value_df |> group_by(cell.id) |> filter(time==1) |>
+  ggplot(mapping=aes(x=log(tmax)))+
+  geom_point(aes(y=roc_val_eTNFa, color=dist))+
+  scale_colour_gradient(high="#FF0000", low = "#0000FF")+
+  ggtitle("AUC for eTNFa")
+
+ggsave(filename="AUC_eTNFa.png",path = save_path, scale=3)
+
+#Order
+value_df |> group_by(cell.id) |> filter(time==1) |>
+  ggplot(mapping=aes(x=log(tmax)))+
+  geom_point(aes(y=roc_val_eTNFa, color=as.factor(cellorder)))+
+  scale_color_discrete()+
+  ggtitle("AUC for eTNFa")
+
+ggsave(filename="AUC_eTNFa_order.png",path = save_path, scale=3)
+
+
 # value_df |> group_by(cell.id) |> filter(time == 800) |>
 #   ggplot(mapping=aes(x=eTNFa))+
 #   ggtitle("eTNFa vs. Frac")+

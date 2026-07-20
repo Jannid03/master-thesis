@@ -47,6 +47,8 @@ init <- function(parameter="tmax", seed = "42", sd_s=2) {
   ###Seed
   xml_set_attr(xml_find_first(file_xml, "//Time//RandomSeed"), "value",seed)
   
+  cellorder <<- c(3,2,3,3,3,2,4,2,4,1,3,3,2,2,4,1,1,3,3,0,2,4,2,1,4,3,1,3,2,2,2,3,2,3,3,3)
+  
   print("Init done")
 }
 
