@@ -19,7 +19,7 @@
     </Space>
     <Time>
         <StartTime value="-200"/>
-        <StopTime value="500"/>
+        <StopTime value="800"/>
         <TimeSymbol symbol="time"/>
         <RandomSeed value="42"/>
     </Time>
