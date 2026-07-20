@@ -2,9 +2,9 @@ make_expression <- function(i) {
   if (i == 36){
     return (paste("if(cell.id==36,",rlnorm(1,log(value),log(sd_s)),",",value,")",sep=''))
   }
-  else if (i == 20){
-    return (paste("if(cell.id==20,",value,",",make_expression(i+1),")",sep=''))
-  }
+  # else if (i == 20){
+  #   return (paste("if(cell.id==20,",value,",",make_expression(i+1),")",sep=''))
+  # }
   else {
     expression <- paste("if(cell.id==",i,",",rlnorm(1,log(value),log(sd_s)),",",make_expression(i+1),")",sep='')
     return (expression)
@@ -166,4 +166,18 @@ load <- function(parameter="base", runn=-1) {
   # df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
   
   value_df <<- df |> mutate(activated_frac = TNFa_TNFR/(TNFa_TNFR+TNFR))
+}
+
+rocs <- function(value_df, val="NFKB.n") {
+  erg <- c()
+  for(i in (1:36)) {
+    df <- value_df |> filter(cell.id == i)
+    x <- df[[val]]
+    sum <- 0
+    for (j in 1:(length(x)-1)) {
+      sum = sum + 1/2 * (x[j]+x[j+1])
+    }
+    erg <- c(erg,sum)
+  }
+  return (erg)
 }
