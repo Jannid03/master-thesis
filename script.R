@@ -4,7 +4,7 @@ setup()
 
 
 
-init("tmax",6257,2.2) #12
+init("tmax",7256,2.2) #12
 run(1)
 
 
@@ -185,8 +185,8 @@ ggsave(filename="AUC_eTNFa_order.png",path = save_path, scale=3)
 x <- seq(0,10,0.001)
 m<-0.01
 v<-1
-plot(x,dlnorm(x,log(0.01),log(1)))
+plot(x,dlnorm(x,log(0.01),log(2)))
 plot(x,plnorm(x,log(m^2/sqrt(m^2+v)),log(1+(v/m^2))))
-hist((rlnorm(1000,log(0.01),log(2))))
+hist(log(rlnorm(1000,log(0.01),log(2))))
 max(rlnorm(1000,log(m^2/sqrt(m^2+v)),log(1+(v/m^2))))
      
