@@ -150,7 +150,7 @@ load <- function(parameter="base", runn=-1) {
     path <- paste(output,"/",dir(output)[length(dir(output))],sep="")
   }
   else {
-    path <- paste("runs/",parameter,"/run_",formatC(run,width=3,flag='0'),sep='')
+    path <- paste("runs/",parameter,"/run_",formatC(runn,width=3,flag='0'),sep='')
   }
   
   print(path)
@@ -168,6 +168,16 @@ load <- function(parameter="base", runn=-1) {
   # df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
   
   value_df <<- df |> mutate(activated_frac = TNFa_TNFR/(TNFa_TNFR+TNFR))
+  save_path <<- path
+}
+
+auc <- function(x) {
+  sum <- 0
+  for (j in 1:(length(x)-1)) {
+    sum = sum + 1/2 * (x[j]+x[j+1])
+  }
+  
+  return(sum)
 }
 
 rocs <- function(value_df, val="NFKB.n") {
@@ -175,11 +185,7 @@ rocs <- function(value_df, val="NFKB.n") {
   for(i in (1:36)) {
     df <- value_df |> filter(cell.id == i)
     x <- df[[val]]
-    sum <- 0
-    for (j in 1:(length(x)-1)) {
-      sum = sum + 1/2 * (x[j]+x[j+1])
-    }
-    erg <- c(erg,sum)
+    erg <- c(erg,auc(x))
   }
   return (erg)
 }
