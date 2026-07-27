@@ -4,7 +4,7 @@ setup()
 
 
 
-init("tmax",7256,2.2) #12
+init("tmax",7258,3) #12
 run(1)
 
 
@@ -115,19 +115,17 @@ ggsave(filename="TNFR_calmed_down.png",path = save_path, scale=3)
 
 ##Kymograph for eTNFa
 value_df |> group_by(cell.id) |>
-  ggplot(mapping=aes(x=cell.id,y=time))+
-  geom_bar(stat="identity", aes(color=eTNFa))+
-  scale_colour_gradient(high="#FF0000", low = "#0000FF")+
-  coord_flip()
+  ggplot(mapping=aes(x=time,y=as.factor(dist)))+
+  geom_raster(mapping=aes(fill=eTNFa))+
+  scale_fill_gradient(high="#FF0000", low = "#0000FF")
 
 ggsave(filename="kymograph_eTNFa.png",path = save_path, scale=3)
 
 #Kymograph for NFKB.n
 value_df |> group_by(cell.id) |>
-  ggplot(mapping=aes(x=cell.id,y=time))+
-  geom_bar(stat="identity", aes(color=NFKB.n))+
-  scale_colour_gradient(high="#FF0000", low = "#0000FF")+
-  coord_flip()
+  ggplot(mapping=aes(x=time,y=as.factor(dist)))+
+  geom_raster(mapping=aes(fill=NFKB.n))+
+  scale_fill_gradient(high="#FF0000", low = "#0000FF")
 
 ggsave(filename="kymograph_NFKB.png",path = save_path, scale=3)
 
@@ -174,19 +172,39 @@ value_df |> group_by(cell.id) |> filter(time==1) |>
 ggsave(filename="AUC_eTNFa_order.png",path = save_path, scale=3)
 
 
-# value_df |> group_by(cell.id) |> filter(time == 800) |>
-#   ggplot(mapping=aes(x=eTNFa))+
-#   ggtitle("eTNFa vs. Frac")+
-#   geom_point(aes(y=activated_frac, color=dist))+
-#   scale_colour_gradient(high="#FF0000", low = "#0000FF")
-# 
-# ggsave(filename="TNFR_vs_eTNFa.png",path = save_path, scale=3)
 
-x <- seq(0,10,0.001)
-m<-0.01
-v<-1
-plot(x,dlnorm(x,log(0.01),log(2)))
-plot(x,plnorm(x,log(m^2/sqrt(m^2+v)),log(1+(v/m^2))))
-hist(log(rlnorm(1000,log(0.01),log(2))))
-max(rlnorm(1000,log(m^2/sqrt(m^2+v)),log(1+(v/m^2))))
+### Response times
+#NFKB
+resptimes <- all_response_times(value_df)
+co <- lm(resptimes ~ log(tmax), as.data.frame(value_df |> group_by(cell.id) |> filter(time ==1)))$coefficients
+
+value_df |> group_by(cell.id) |> filter(time==1) |>
+  ggplot(mapping=aes(x=log(tmax)))+
+  geom_point(aes(y=resptimes, color=dist))+
+  geom_line(mapping=aes(y=co[1]+co[2]*log(tmax)), alpha=0.5, linetype="dashed")+
+  scale_colour_gradient(high="#FF0000", low = "#0000FF")+
+  ggtitle("Response Times for NFKB.n")
+
+ggsave(filename="response_time_NFKB.png",path = save_path, scale=3)
+
+
+#eTNF
+resptimes <- all_response_times(value_df,value="eTNFa")
+co <- lm(resptimes ~ log(tmax), as.data.frame(value_df |> group_by(cell.id) |> filter(time ==1)))$coefficients
+
+value_df |> group_by(cell.id) |> filter(time==1) |>
+  ggplot(mapping=aes(x=log(tmax)))+
+  geom_point(aes(y=resptimes, color=dist))+
+  geom_line(mapping=aes(y=co[1]+co[2]*log(tmax)), alpha=0.5, linetype="dashed")+
+  scale_colour_gradient(high="#FF0000", low = "#0000FF")+
+  ggtitle("Response Times for eTNFa")
+
+ggsave(filename="response_time_eTNFa.png",path = save_path, scale=3)
+# x <- seq(0,10,0.001)
+# m<-0.01
+# v<-1
+# plot(x,dlnorm(x,log(0.01),log(2)))
+# plot(x,plnorm(x,log(m^2/sqrt(m^2+v)),log(1+(v/m^2))))
+# hist(log(rlnorm(1000,log(0.01),log(2))))
+# max(rlnorm(1000,log(m^2/sqrt(m^2+v)),log(1+(v/m^2))))
      
