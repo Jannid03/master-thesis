@@ -189,3 +189,37 @@ rocs <- function(value_df, val="NFKB.n") {
   }
   return (erg)
 }
+
+response_time <- function(valuedf, value="NFKB.n", id=20) {
+  t <- valuedf |> filter(cell.id == id) |> filter(time>=0) |> slice_max(.data[[value]])
+  
+  t1 <- valuedf |> filter(time >= t[["time"]]) |> filter(time <= 799) |> filter(cell.id==id)
+  
+  t2 <- valuedf |> filter(time >= t[["time"]]+1) |> filter(cell.id==id)
+  
+  t3 <- (t2-t1)[[value]]
+  ausgang <- t1[[value]][1]
+  
+  newy <- c(ausgang)
+  for (i in 1:length(t3)) {
+    newy <- c(newy, newy[length(newy)]+abs(t3[i]))
+  }
+  maxy <- max(newy)
+  auc_t3 <- auc(newy)
+  auc_max <- (800-t[["time"]])*maxy
+  A2 <- auc_max - auc_t3
+  
+  bis_max <- valuedf |> filter(cell.id == id) |> filter(time >= 0) |> filter(time <= t[["time"]])
+  auc_ori <- auc(bis_max[[value]])
+  A1 <- (t[["time"]]*maxy) - auc_ori
+  
+  return((A1+A2)/maxy)
+}
+
+all_response_times <- function(valuedf,value="NFKB.n") {
+  erg <- c()
+  for (i in 1:36) {
+    erg <- c(erg,response_time(valuedf, value, i))
+  }
+  return (erg)
+}
