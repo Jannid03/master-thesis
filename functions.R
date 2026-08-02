@@ -191,29 +191,26 @@ rocs <- function(value_df, val="NFKB.n") {
 }
 
 response_time <- function(valuedf, value="NFKB.n", id=20) {
-  t <- valuedf |> filter(cell.id == id) |> filter(time>=0) |> slice_max(.data[[value]])
+  #-1 because the logger file has -7.XXXe-12 as timepoint 0
+  t1 <- valuedf |> filter(time > -1) |> filter(time <= 799) |> filter(cell.id==id)
+  # print(length(t1[[value]]))
   
-  t1 <- valuedf |> filter(time >= t[["time"]]) |> filter(time <= 799) |> filter(cell.id==id)
-  
-  t2 <- valuedf |> filter(time >= t[["time"]]+1) |> filter(cell.id==id)
-  
+  t2 <- valuedf |> filter(time >= 1) |> filter(cell.id==id)
+  # print(length(t2[[value]]))
   t3 <- (t2-t1)[[value]]
-  ausgang <- t1[[value]][1]
   
-  newy <- c(ausgang)
+  newy <- c(t1[[value]][1])
   for (i in 1:length(t3)) {
+    # print(newy[length(newy)]+abs(t3[i]))
     newy <- c(newy, newy[length(newy)]+abs(t3[i]))
   }
+  # print(newy)
   maxy <- max(newy)
   auc_t3 <- auc(newy)
-  auc_max <- (800-t[["time"]])*maxy
-  A2 <- auc_max - auc_t3
+  auc_max <- 800*maxy
+  A <- auc_max - auc_t3
   
-  bis_max <- valuedf |> filter(cell.id == id) |> filter(time >= 0) |> filter(time <= t[["time"]])
-  auc_ori <- auc(bis_max[[value]])
-  A1 <- (t[["time"]]*maxy) - auc_ori
-  
-  return((A1+A2)/maxy)
+  return(A/(maxy))
 }
 
 all_response_times <- function(valuedf,value="NFKB.n") {
