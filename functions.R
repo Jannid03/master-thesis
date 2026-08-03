@@ -190,9 +190,9 @@ rocs <- function(value_df, val="NFKB.n") {
   return (erg)
 }
 
-response_time <- function(valuedf, value="NFKB.n", id=20) {
+response_time <- function(valuedf, value="NFKB.n", id=20, t) {
   #-1 because the logger file has -7.XXXe-12 as timepoint 0
-  t1 <- valuedf |> filter(time > -1) |> filter(time <= 799) |> filter(cell.id==id)
+  t1 <- valuedf |> filter(time > -1) |> filter(time <= t-1) |> filter(cell.id==id)
   # print(length(t1[[value]]))
   
   t2 <- valuedf |> filter(time >= 1) |> filter(cell.id==id)
@@ -207,16 +207,16 @@ response_time <- function(valuedf, value="NFKB.n", id=20) {
   # print(newy)
   maxy <- max(newy)
   auc_t3 <- auc(newy)
-  auc_max <- 800*maxy
+  auc_max <- t*maxy
   A <- auc_max - auc_t3
   
   return(A/(maxy))
 }
 
-all_response_times <- function(valuedf,value="NFKB.n") {
+all_response_times <- function(valuedf,value="NFKB.n",t=800) {
   erg <- c()
   for (i in 1:36) {
-    erg <- c(erg,response_time(valuedf, value, i))
+    erg <- c(erg,response_time(valuedf, value, i,t))
   }
   return (erg)
 }
