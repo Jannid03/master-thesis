@@ -1,12 +1,12 @@
 make_expression <- function(i) {
   if (i == 36){
-    return (paste("if(cell.id==36,",rlnorm(1,log(value),log(sd_s)),",",value,")",sep=''))
+    return (paste("if(cell.id==36,",rlnorm(1,log(value^2/(sqrt(value^2+sd_s^2))),sqrt(log(1+(sd_s^2/value^2)))),",",value,")",sep=''))
   }
   # else if (i == 20){
   #   return (paste("if(cell.id==20,",value,",",make_expression(i+1),")",sep=''))
   # }
   else {
-    expression <- paste("if(cell.id==",i,",",rlnorm(1,log(value),log(sd_s)),",",make_expression(i+1),")",sep='')
+    expression <- paste("if(cell.id==",i,",",rlnorm(1,log(value^2/(sqrt(value^2+sd_s^2))),sqrt(log(1+(sd_s^2/value^2)))),",",make_expression(i+1),")",sep='')
     return (expression)
   }
 }
@@ -143,6 +143,8 @@ run <- function(n=1) {
     command_output <- system(command, intern = TRUE)
     write(command_output, paste(output,"/output.txt",sep=""))
   }
+  
+  print("Run done")
 }
 
 load <- function(parameter="base", runn=-1) {
@@ -207,6 +209,7 @@ response_time <- function(valuedf, value="NFKB.n", id=20, t) {
   # print(newy)
   maxy <- max(newy)
   auc_t3 <- auc(newy)
+  print(auc_t3)
   auc_max <- t*maxy
   A <- auc_max - auc_t3
   
