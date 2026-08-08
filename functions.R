@@ -126,7 +126,7 @@ auc <- function(x) {
 }
 
 ### Area under all curves
-rocs <- function(value_df, val="NFKB.n") {
+all_auc <- function(value_df, val="NFKB.n") {
   erg <- c()
   for(i in (1:36)) {
     df <- value_df |> filter(cell.id == i)
