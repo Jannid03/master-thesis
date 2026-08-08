@@ -223,3 +223,16 @@ all_response_times <- function(valuedf,value="NFKB.n",t=800) {
   }
   return (erg)
 }
+
+all_cells <- function(valuedf,ploty="NFKB.n") {
+  valuedf |> group_by(cell.id) |>
+    ggplot(mapping=aes(x=time, y=.data[[ploty]], group=cell.id,
+                       colour=log(tmax)))+
+    geom_line()+
+    scale_colour_gradient(high="#FF0000", low = "#0000FF")+
+    geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
+    geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
+  
+  
+  ggsave(filename=paste("all_cells_",ploty,".png"),path = save_path, scale=3)
+}
