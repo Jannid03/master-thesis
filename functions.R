@@ -274,3 +274,15 @@ maxima <- function(valuedf,plott="NFKB.n") {
   
   ggsave(filename=paste("maximum_",plott,".png"),path = save_path, scale=3)
 }
+
+### Plotting AUCs of all plott curves vs. log(tmax)
+auc_plot <- function(valuedf,plott="NFKB.n") {
+  auc_val <- all_auc(value_df,plott)
+  
+  value_df |> group_by(cell.id) |> filter(time==1) |>
+    ggplot(mapping=aes(x=log(tmax)))+
+    geom_point(aes(y=auc_val, color=dist))+
+    scale_colour_gradient(high="#FF0000", low = "#0000FF")
+  
+  ggsave(filename=paste("AUC_",plott,".png"),path = save_path, scale=3)
+}
