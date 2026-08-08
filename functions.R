@@ -236,3 +236,12 @@ all_cells <- function(valuedf,ploty="NFKB.n") {
   
   ggsave(filename=paste("all_cells_",ploty,".png"),path = save_path, scale=3)
 }
+
+kymograph <- function(valuedf,plott="NFKB.n",ploty="dist") {
+  value_df |> group_by(cell.id) |>
+    ggplot(mapping=aes(x=time,y=as.factor(.data[[ploty]])))+
+    geom_raster(mapping=aes(fill=.data[[plott]]))+
+    scale_fill_gradient(high="#FF0000", low = "#0000FF")
+  
+  ggsave(filename=paste("kymograph_",plott,".png"),path = save_path, scale=3)
+}
