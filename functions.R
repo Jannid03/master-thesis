@@ -243,5 +243,18 @@ kymograph <- function(valuedf,plott="NFKB.n",ploty="dist") {
     geom_raster(mapping=aes(fill=.data[[plott]]))+
     scale_fill_gradient(high="#FF0000", low = "#0000FF")
   
-  ggsave(filename=paste("kymograph_",plott,".png"),path = save_path, scale=3)
+  ggsave(filename=paste("kymograph_",plott,"_vs._",ploty,".png"),path = save_path, scale=3)
+}
+
+maxima <- function(valuedf,plott="NFKB.n") {
+  co <- lm(time ~ log(tmax), as.data.frame(value_df |> group_by(cell.id) |> slice_max(.data[[plott]])))$coefficients
+  
+  value_df |> group_by(cell.id) |> slice_max(.data[[plott]]) |>
+    ggplot(mapping=aes(x=log(tmax)))+
+    ggtitle(paste(plott," Maxima"))+
+    geom_point(aes(y=time, color=.data[[plott]]))+
+    geom_line(mapping=aes(y=co[1]+co[2]*log(tmax)), alpha=0.5, linetype="dashed")+
+    scale_colour_gradient(high="#FF0000", low = "#0000FF")
+  
+  ggsave(filename=paste("maximum_",plott,".png"),path = save_path, scale=3)
 }
