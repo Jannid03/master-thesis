@@ -26,28 +26,30 @@ setup <- function() {
   print("Setup done")
 }
 
-init <- function(parameter="tmax", seed = "42", sd_s=2) {
+init <- function(parameter, seed = "42", sd_s=2) {
   set.seed(seed)
   parameter <<- parameter
-  sd_s <<- sd_s
-  path <<- paste("//CellTypes//Property[@symbol=","\"",parameter,"\"]",sep = "")
-  value <<- xml_double(xml_find_all(file_xml,paste(path, "//@value")))
-  output <<- paste("runs/",parameter,sep="")
-  
-  
-  ### Cells
-  expr <- make_expression(1)
-  
-  expr_path <<- (xml_find_first(file_xml,"//CellPopulations//Population"))
-  xml_add_child(expr_path,"InitProperty")
-  xml_set_attr(xml_find_first(file_xml, "//CellPopulations//Population//InitProperty"), "symbol-ref",parameter)
-  xml_add_child(xml_find_first(file_xml, "//CellPopulations//Population//InitProperty"),"Expression",expr)
+  if(parameter != "base") {
+    sd_s <<- sd_s
+    path <<- paste("//CellTypes//Property[@symbol=","\"",parameter,"\"]",sep = "")
+    value <<- xml_double(xml_find_all(file_xml,paste(path, "//@value")))
+    
+    
+    ### Cells
+    expr <- make_expression(1)
+    
+    expr_path <<- (xml_find_first(file_xml,"//CellPopulations//Population"))
+    xml_add_child(expr_path,"InitProperty")
+    xml_set_attr(xml_find_first(file_xml, "//CellPopulations//Population//InitProperty"), "symbol-ref",parameter)
+    xml_add_child(xml_find_first(file_xml, "//CellPopulations//Population//InitProperty"),"Expression",expr)
+    }
   
   
   ###Seed
   xml_set_attr(xml_find_first(file_xml, "//Time//RandomSeed"), "value",seed)
   
   cellorder <<- c(3,2,3,3,3,2,4,2,4,1,3,3,2,2,4,1,1,3,3,0,2,4,2,1,4,3,1,3,2,2,2,3,2,3,3,3)
+  output <<- paste("runs/",parameter,sep="")
   
   print("Init done")
 }
