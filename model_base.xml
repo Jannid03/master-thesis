@@ -397,7 +397,7 @@
             </System>
             <Property symbol="NFKB" name="cytoplasm NF-KB " tags="cytoplasm" value="0"/>
             <Property symbol="NFKB.n" name="nucleus NF-KB" tags="nucleus" value="0.0"/>
-            <Property symbol="IKK" tags="cytoplasm" value="0"/>
+            <Property symbol="IKK" tags="cytoplasm" value="0.00075"/>
             <Property symbol="IKK_IKBA" tags="cytoplasm" value="0.0"/>
             <Property symbol="IKK_NFKB_IKBA" tags="cytoplasm" value="0.0"/>
             <Property symbol="NFKB_IKBA" name="cytoplasm NF-KB/IKBA complex" tags="cytoplasm" value="0.01"/>
