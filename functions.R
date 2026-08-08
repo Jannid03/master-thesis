@@ -173,13 +173,7 @@ all_response_times <- function(valuedf,value="NFKB.n",t=800) {
 #### PLOTTING ####
 
 ### Plotting all variable species for a specific cell.id
-standard_plots <- function(df, cellid = 20, param = "base", runn = -1) {
-  if (runn == -1) {
-    save_path <<- paste(output,"/",dir(output)[length(dir(output))],sep="")
-  }
-  else {
-    save_path <<- paste("runs/",param,"/run_",formatC(runn,width=3,flag='0'),sep="")
-  }
+standard_plots <- function(df, cellid = 20) {
   
   df |> filter(cell.id == cellid) |>
     ggplot(mapping=aes(x=time))+
