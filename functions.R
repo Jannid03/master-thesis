@@ -154,7 +154,7 @@ response_time <- function(valuedf, value="NFKB.n", id=20, t) {
   # print(newy)
   maxy <- max(newy)
   auc_t3 <- auc(newy)
-  print(auc_t3)
+  # print(auc_t3)
   auc_max <- t*maxy
   A <- auc_max - auc_t3
   
@@ -285,4 +285,20 @@ auc_plot <- function(valuedf,plott="NFKB.n") {
     scale_colour_gradient(high="#FF0000", low = "#0000FF")
   
   ggsave(filename=paste("AUC_",plott,".png"),path = save_path, scale=3)
+}
+
+### Plotting response times of all plott curves
+response_plot <- function(valuedf,plott="NFKB.n",t=800) {
+  resptimes <- all_response_times(value_df,plott,t)
+  
+  co <- lm(resptimes ~ log(tmax), as.data.frame(value_df |> group_by(cell.id) |> filter(time ==1)))$coefficients
+  
+  value_df |> group_by(cell.id) |> filter(time==1) |>
+    ggplot(mapping=aes(x=log(tmax)))+
+    geom_point(aes(y=resptimes, color=dist))+
+    geom_line(mapping=aes(y=co[1]+co[2]*log(tmax)), alpha=0.5, linetype="dashed")+
+    scale_colour_gradient(high="#FF0000", low = "#0000FF")
+  
+  ggsave(filename=paste("response_time_",plott,".png"),path = save_path, scale=3)
+  
 }
