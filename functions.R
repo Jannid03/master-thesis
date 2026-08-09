@@ -103,7 +103,7 @@ load <- function(parameter="base", runn=-1) {
   cell_pos <- read.csv(paste(path,"/logger_1.csv",sep=''), header = TRUE, dec = '.', sep = "\t")
   cell_pos <- as_tibble(cell_pos)
   
-  cell_pos <<- cell_pos |> group_by(time) |> mutate(new_dist = sqrt((cell.center.x-cell.center.x[20])^2+(cell.center.y-cell.center.y[20])^2))
+  cell_pos <- cell_pos |> group_by(time) |> mutate(new_dist = sqrt((cell.center.x-cell.center.x[20])^2+(cell.center.y-cell.center.y[20])^2))
   
   df <- df |> mutate("dist" = cell_pos$dist)
   df <- df |> mutate("order" = rep(cellorder,times = 1001))
@@ -111,9 +111,8 @@ load <- function(parameter="base", runn=-1) {
   # df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
   
   df <- df |> mutate(activated_frac = TNFa_TNFR/(TNFa_TNFR+TNFR))
-  save_path <<- path
   
-  return(df)
+  return(list("df"=df,"save_path"=path, "cell_pos"=cell_pos))
 }
 
 #### MATH FUNCTIONS ####
@@ -176,7 +175,9 @@ all_response_times <- function(valuedf,value="NFKB.n",t=800) {
 #### PLOTTING ####
 
 ### Plotting all variable species for a specific cell.id
-standard_plots <- function(df, cellid = 20) {
+standard_plots <- function(dflist, cellid = 20) {
+  df <- dflist$df
+  save_path <- dflist$save_path
   
   df |> filter(cell.id == cellid) |>
     ggplot(mapping=aes(x=time))+
@@ -241,7 +242,10 @@ standard_plots <- function(df, cellid = 20) {
 }
 
 ### Plotting all curves of all cell ids 
-all_cells <- function(valuedf,ploty="NFKB.n", color="logtmax") {
+all_cells <- function(dflist,ploty="NFKB.n", color="logtmax") {
+  valuedf <- dflist$df
+  save_path <- dflist$save_path
+  
   valuedf <- valuedf |> group_by(cell.id)
   
   if(substr(color,1,3) == "log") {
@@ -268,7 +272,10 @@ all_cells <- function(valuedf,ploty="NFKB.n", color="logtmax") {
 }
 
 ### Plotting kymograph 
-kymograph <- function(valuedf,plott="NFKB.n",ploty="dist") {
+kymograph <- function(dflist,plott="NFKB.n",ploty="dist") {
+  valuedf <- dflist$df
+  save_path <- dflist$save_path
+  
   pl <- valuedf |> group_by(cell.id) |>
     ggplot(mapping=aes(x=time,y=as.factor(.data[[ploty]])))+
     geom_raster(mapping=aes(fill=.data[[plott]]))+
@@ -280,7 +287,10 @@ kymograph <- function(valuedf,plott="NFKB.n",ploty="dist") {
 }
 
 ### Plotting Maximas of plott vs. plotx
-maxima <- function(valuedf,plott="NFKB.n",plotx="logtmax") {
+maxima <- function(dflist,plott="NFKB.n",plotx="logtmax") {
+  valuedf <- dflist$df
+  save_path <- dflist$save_path
+  
   valuedf <- valuedf |> group_by(cell.id) |> slice_max(.data[[plott]])
   if(substr(plotx,1,3) == "log") {
     x <- substring(plotx,first=4)
@@ -307,7 +317,10 @@ maxima <- function(valuedf,plott="NFKB.n",plotx="logtmax") {
 }
 
 ### Plotting AUCs of all plott curves vs. plotx
-auc_plot <- function(valuedf,plott="NFKB.n",plotx="logtmax",color="dist") {
+auc_plot <- function(dflist,plott="NFKB.n",plotx="logtmax",color="dist") {
+  valuedf <- dflist$df
+  save_path <- dflist$save_path
+  
   auc_val <- all_auc(valuedf,plott)
   
   valuedf <- valuedf |> group_by(cell.id) |> filter(time==1)
@@ -343,8 +356,11 @@ auc_plot <- function(valuedf,plott="NFKB.n",plotx="logtmax",color="dist") {
 }
 
 ### Plotting response times of all plott curves
-response_plot <- function(valuedf,plott="NFKB.n",plotx="logtmax",color="dist",t=800) {
-  resptimes <- all_response_times(value_df,plott,t)
+response_plot <- function(dflist,plott="NFKB.n",plotx="logtmax",color="dist",t=800) {
+  valuedf <- dflist$df
+  save_path <- dflist$save_path
+  
+  resptimes <- all_response_times(valuedf,plott,t)
   valuedf <- valuedf |> group_by(cell.id) |> filter(time==1)
   
   if(substr(color,1,3) == "log") {
