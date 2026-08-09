@@ -4,11 +4,11 @@ setup()
 
 ## For base simulation
 # init("base",42)
-init("tmax",8453,sqrt(0.001)) #12
+init("tmax",4860,sqrt(0.1)) #12
 run()
 
 # load(parameter = "tmax", runn = 48)
-load()
+value_df <- load()
 standard_plots(value_df)
 # standard_plots(value_df,27)
 
