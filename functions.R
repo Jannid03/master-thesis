@@ -11,14 +11,14 @@ setup <- function() {
   library(XML)
   library(EnvStats)
   
-  ### Preparation
-  file_xml <<- read_xml("model_base.xml")
-  
   print("Setup done")
 }
 
 ### Initializing the desired XML File
 init <- function(parameter, seed = "42", sd_s=2) {
+  ### Preparation
+  file_xml <<- read_xml("model_base.xml")
+  
   set.seed(seed)
   parameter <<- parameter
   if(parameter != "base") {
@@ -264,7 +264,7 @@ all_cells <- function(valuedf,ploty="NFKB.n", color="logtmax") {
   
   ggsave(filename=paste("all_cells_",ploty,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
   
-  retunr(pl)
+  return(pl)
 }
 
 ### Plotting kymograph 
