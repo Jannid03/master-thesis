@@ -110,8 +110,10 @@ load <- function(parameter="base", runn=-1) {
   
   # df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
   
-  value_df <<- df |> mutate(activated_frac = TNFa_TNFR/(TNFa_TNFR+TNFR))
+  df <- df |> mutate(activated_frac = TNFa_TNFR/(TNFa_TNFR+TNFR))
   save_path <<- path
+  
+  return(df)
 }
 
 #### MATH FUNCTIONS ####
@@ -251,7 +253,7 @@ all_cells <- function(valuedf,ploty="NFKB.n", color="logtmax") {
     logs <- "_"
   }
   
-  valuedf |>
+  pl <- valuedf |>
     ggplot(mapping=aes(x=time, y=.data[[ploty]], group=cell.id,
                        colour=color_v))+
     geom_line()+
@@ -260,17 +262,21 @@ all_cells <- function(valuedf,ploty="NFKB.n", color="logtmax") {
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
   
-  ggsave(filename=paste("all_cells_",ploty,logs,color,".png"),path = save_path, scale=3)
+  ggsave(filename=paste("all_cells_",ploty,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
+  
+  retunr(pl)
 }
 
 ### Plotting kymograph 
 kymograph <- function(valuedf,plott="NFKB.n",ploty="dist") {
-  valuedf |> group_by(cell.id) |>
+  pl <- valuedf |> group_by(cell.id) |>
     ggplot(mapping=aes(x=time,y=as.factor(.data[[ploty]])))+
     geom_raster(mapping=aes(fill=.data[[plott]]))+
     scale_fill_gradient(high="#FF0000", low = "#0000FF")
   
-  ggsave(filename=paste("kymograph_",plott,"_vs_",ploty,".png"),path = save_path, scale=3)
+  ggsave(filename=paste("kymograph_",plott,"_vs_",ploty,".png"),path = save_path, width=3000, height=2000, units="px")
+  
+  return(pl)
 }
 
 ### Plotting Maximas of plott vs. plotx
@@ -288,14 +294,16 @@ maxima <- function(valuedf,plott="NFKB.n",plotx="logtmax") {
   
   co <- lm(time ~ x_v, as.data.frame(valuedf))$coefficients
 
-  valuedf |>
+  pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
     ggtitle(paste(plott," Maxima"))+
     geom_point(aes(y=time, color=.data[[plott]]))+
     geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
     scale_colour_gradient(high="#FF0000", low = "#0000FF")
   
-  ggsave(filename=paste("maximum_",plott,logs,x,".png"),path = save_path, scale=3)
+  ggsave(filename=paste("maximum_",plott,logs,x,".png"),path = save_path, width=3000, height=2000, units="px")
+  
+  return(pl)
 }
 
 ### Plotting AUCs of all plott curves vs. plotx
@@ -324,12 +332,14 @@ auc_plot <- function(valuedf,plott="NFKB.n",plotx="logtmax",color="dist") {
     logs_x <- "_"
   }
   
-  valuedf |>
+  pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
     geom_point(aes(y=auc_val, color=color_v))+
     scale_colour_gradient(high="#FF0000", low = "#0000FF")
   
-  ggsave(filename=paste("AUC_",plott,logs_x,x,logs,color,".png"),path = save_path, scale=3)
+  ggsave(filename=paste("AUC_",plott,logs_x,x,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
+  
+  return(pl)
 }
 
 ### Plotting response times of all plott curves
@@ -360,12 +370,14 @@ response_plot <- function(valuedf,plott="NFKB.n",plotx="logtmax",color="dist",t=
   
   co <- lm(resptimes ~ x_v, as.data.frame(valuedf))$coefficients
   
-  valuedf |>
+  pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
     geom_point(aes(y=resptimes, color=color_v))+
     geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
     scale_colour_gradient(high="#FF0000", low = "#0000FF")
   
-  ggsave(filename=paste("response_time_",plott,logs_x,x,logs,color,".png"),path = save_path, scale=3)
+  ggsave(filename=paste("response_time_",plott,logs_x,x,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
+  
+  return(pl)
   
 }
