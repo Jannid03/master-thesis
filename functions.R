@@ -10,6 +10,7 @@ setup <- function() {
   library(xml2)
   library(XML)
   library(EnvStats)
+  library(patchwork)
   
   print("Setup done")
 }
@@ -94,8 +95,6 @@ load <- function(parameter="base", runn=-1) {
   else {
     path <- paste("runs/",parameter,"/run_",formatC(runn,width=3,flag='0'),sep='')
   }
-  
-  print(path)
   
   df <- read.csv(paste(path,"/logger_2.csv",sep=''), header = TRUE, dec = '.', sep = "\t")
   df <- as_tibble(df)

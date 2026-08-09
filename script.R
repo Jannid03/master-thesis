@@ -35,6 +35,26 @@ auc_plot(value_df,"eTNFa")
 response_plot(value_df)
 response_plot(value_df,"eTNFa")
 
+
+
+#### Multiple ####
+multiple <- list(
+  c("tmax",55),
+  c("base",1)
+)
+
+plots <- list()
+for (i in 1:(length(multiple))) {
+  par <- multiple[[i]][1]
+  runs <- multiple[[i]][2]
+  print(runs)
+  
+  dfs <- load(par,as.double(runs))
+  plots[[as.character(i)]] <- all_cells(dfs)
+}
+
+plots[[2]] + plots[[1]]
+
 ### "Recovery time" of NFKB
 # co <- lm(time ~ log(tmax), as.data.frame(value_df |> group_by(cell.id) |> filter(time > 100) |> filter(NFKB.n < 1e-5) |> slice_min(time)))$coefficients
 # 
