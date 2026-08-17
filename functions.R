@@ -1,6 +1,12 @@
 ##### Functions to use in the Script #####
 
 #### TECHNICAL ####
+linestyle <- function () {
+  n <- rep(1,36)
+  n[20] <- 2
+  
+  return(rep(n,each=1051))
+}
 
 ###Setup for libraries etc.
 setup <- function() {
@@ -62,9 +68,12 @@ make_expression <- function(i) {
 }
 
 ### Running the modified XML file
-run <- function(n=1) {
+run <- function(n=TRUE,num=1) {
   
-  if (length(dir(output)) == 0) {
+  if(n) {
+    last <- num-1
+  }
+  else if (length(dir(output)) == 0) {
     last <-0
   } else {
     last <- as.numeric(substr(dir(output)[length(dir(output))],5,8))
@@ -105,7 +114,7 @@ load <- function(parameter="base", runn=-1) {
   cell_pos <- cell_pos |> group_by(time) |> mutate(new_dist = sqrt((cell.center.x-cell.center.x[20])^2+(cell.center.y-cell.center.y[20])^2))
   
   df <- df |> mutate("dist" = cell_pos$dist)
-  df <- df |> mutate("order" = rep(cellorder,times = 1001))
+  df <- df |> mutate("order" = rep(cellorder,times = 1051))
   
   # df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
   
@@ -272,18 +281,16 @@ all_cells <- function(dflist,ploty="NFKB.n", color="foldtmax", scaled=FALSE) {
     mp <- (min(color_v) + max(color_v) )/2
   }
   
-  
   pl <- valuedf |>
-    ggplot(mapping=aes(x=time, y=.data[[ploty]], group=cell.id,
-                       colour=color_v))+
+    ggplot(mapping=aes(x=time, y=.data[[ploty]], group=cell.id))+
     #geom_line(linewidth=0.55, color="black")+
-    geom_line()+
+    geom_line(aes(colour=color_v),linetype=linestyle())+
     scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name=name)+
     geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
   
-  ggsave(filename=paste("all_cells_",ploty,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
+  # ggsave(filename=paste("all_cells_",ploty,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
   
   return(pl)
 }
