@@ -31,26 +31,38 @@ for (i in 0:299){
   # 
   # vals <- c(vals, mean(end[["NFKB.n"]])/mean(first[["NFKB.n"]]))
   
-  max_pre <- value_df$df |> group_by(cell.id) |> filter(time <= -1) |> slice_max(NFKB.n)
   
-  max_post <- value_df$df |> group_by(cell.id) |> filter(time > -1) |> slice_max(NFKB.n)
+  ### Which curves are under their pre time maximum?
+  # max_pre <- value_df$df |> group_by(cell.id) |> filter(time <= -1) |> slice_max(NFKB.n)
+  # 
+  # max_post <- value_df$df |> group_by(cell.id) |> filter(time > -1) |> slice_max(NFKB.n)
+  # 
+  # vals <- c(vals, sum(max_pre[["NFKB.n"]]*0.9 > max_post[["NFKB.n"]]))
   
-  vals <- c(vals, sum(max_pre[["NFKB.n"]]*0.9 > max_post[["NFKB.n"]]))
+  ### Which curves are inactive (less than 10% over value at t=0 )
+  max_pre <- value_df$df |> group_by(cell.id) |> filter(time > -1) |> filter(time <1) |> slice_max(NFKB.n)
+  
+  max_post <- value_df$df |> group_by(cell.id) |> filter(time >= 1) |> slice_max(NFKB.n)
+  
+  vals <- c(vals, sum(max_pre[["NFKB.n"]]*1.1 > max_post[["NFKB.n"]]))
   
 }
 
 # results <- data.frame("var"=as.factor(rep(c(0.001,0.01,0.1),each=100)),"average_rise"=vals)
 
-results <- cbind(results,data.frame(""=vals))
+results <- cbind(results,data.frame("non_activated_t0"=vals))
 
 ggplot(data=results)+
   geom_boxplot(mapping=aes(x=(var),y=average_rise))
 
 ggplot(data=results)+
   geom_boxplot(mapping=aes(x=var,y=non_activated_premax))
+
+ggplot(data=results)+
+  geom_boxplot(mapping=aes(x=var,y=non_activated_t0))
 # 
 # plot(1:100,ends)
-# value_df <- load(parameter = "tmax", runn = 241)
+# value_df <- load(parameter = "tmax", runn = 229)
 # value_df <- load()
 # standard_plots(value_df)
 # # standard_plots(value_df,27)
