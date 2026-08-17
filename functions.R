@@ -8,6 +8,13 @@ linestyle <- function () {
   return(rep(n,each=1051))
 }
 
+pointstyle <- function() {
+  n <- rep(21,36)
+  n[20] <- 22
+  
+  return(n)
+}
+
 ###Setup for libraries etc.
 setup <- function() {
   library(ggplot2)
@@ -290,7 +297,7 @@ all_cells <- function(dflist,ploty="NFKB.n", color="foldtmax", scaled=FALSE) {
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
   
-  # ggsave(filename=paste("all_cells_",ploty,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
+  ggsave(filename=paste("all_cells_",ploty,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
   
   return(pl)
 }
@@ -343,7 +350,7 @@ maxima <- function(dflist,plott="NFKB.n",plotx="foldtmax",scalex=FALSE) {
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
     ggtitle(paste(plott," Maxima"))+
-    geom_point(shape = 21,stroke=0.5, color="black",aes(y=time,fill=.data[[plott]]))+
+    geom_point(shape = pointstyle(),stroke=0.5, color="black",aes(y=time,fill=.data[[plott]]))+
     geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
     scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name="NFKB value")+
     xlab(namex)
