@@ -11,6 +11,7 @@ setup <- function() {
   library(XML)
   library(EnvStats)
   library(patchwork)
+  library(ggpubr)
   
   print("Setup done")
 }
@@ -26,7 +27,6 @@ init <- function(parameter, seed = "42", sd_s=2) {
     sd_s <<- sd_s
     path <<- paste("//CellTypes//Property[@symbol=","\"",parameter,"\"]",sep = "")
     value <<- xml_double(xml_find_all(file_xml,paste(path, "//@value")))
-    
     
     ### Cells
     expr <- make_expression(1)
@@ -241,7 +241,7 @@ standard_plots <- function(dflist, cellid = 20) {
 }
 
 ### Plotting all curves of all cell ids 
-all_cells <- function(dflist,ploty="NFKB.n", color="logtmax") {
+all_cells <- function(dflist,ploty="NFKB.n", color="foldtmax", scaled=FALSE) {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
@@ -251,16 +251,34 @@ all_cells <- function(dflist,ploty="NFKB.n", color="logtmax") {
     color <- substring(color,first=4)
     color_v <- log(valuedf[[color]])
     logs <- "_log_"
-  } else {
+    name <- paste("Log",color)
+  } else if (substr(color,1,4) == "fold") {
+    color <- substring(color,first=5)
+    color_v <- (valuedf[[color]])/value
+    logs <- "_fold_"
+    name <- paste("Fold",color)
+  }
+  else {
     color_v <- valuedf[[color]]
     logs <- "_"
+    name <- color
   }
+  
+  if(scaled) {
+    color_v <- scales::rescale(color_v,to=c(0,1))
+    mp <- 0.5
+  }
+  else {
+    mp <- (min(color_v) + max(color_v) )/2
+  }
+  
   
   pl <- valuedf |>
     ggplot(mapping=aes(x=time, y=.data[[ploty]], group=cell.id,
                        colour=color_v))+
+    #geom_line(linewidth=0.55, color="black")+
     geom_line()+
-    scale_colour_gradient(high="#FF0000", low = "#0000FF")+
+    scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name=name)+
     geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
     geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
   
@@ -285,8 +303,8 @@ kymograph <- function(dflist,plott="NFKB.n",ploty="dist") {
   return(pl)
 }
 
-### Plotting Maximas of plott vs. plotx
-maxima <- function(dflist,plott="NFKB.n",plotx="logtmax") {
+### Plotting time of Maximas of plott vs. plotx
+maxima <- function(dflist,plott="NFKB.n",plotx="foldtmax",scalex=FALSE) {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
@@ -295,20 +313,33 @@ maxima <- function(dflist,plott="NFKB.n",plotx="logtmax") {
     x <- substring(plotx,first=4)
     x_v <- log(valuedf[[x]])
     logs <- "_log_"
+    namex <- paste("Log",x)
+  } else if (substr(plotx,1,4) == "fold") {
+    x <- substring(plotx,first=5)
+    x_v <- (valuedf[[x]])/value
+    logs <- "_fold_"
+    namex <- paste("Fold",x)
   } else {
     x <- plotx
     x_v <- valuedf[[x]]
     logs <- "_"
+    namex <- x
   }
   
+  if(scalex) {
+    x_v <- scales::rescale(x_v,to=c(0,1))
+  }
+  
+  mp <- (min(valuedf[[plott]]) + max(valuedf[[plott]]) )/2
   co <- lm(time ~ x_v, as.data.frame(valuedf))$coefficients
 
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
     ggtitle(paste(plott," Maxima"))+
-    geom_point(aes(y=time, color=.data[[plott]]))+
+    geom_point(shape = 21,stroke=0.5, color="black",aes(y=time,fill=.data[[plott]]))+
     geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
-    scale_colour_gradient(high="#FF0000", low = "#0000FF")
+    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name="NFKB value")+
+    xlab(namex)
   
   ggsave(filename=paste("maximum_",plott,logs,x,".png"),path = save_path, width=3000, height=2000, units="px")
   
@@ -316,7 +347,7 @@ maxima <- function(dflist,plott="NFKB.n",plotx="logtmax") {
 }
 
 ### Plotting AUCs of all plott curves vs. plotx
-auc_plot <- function(dflist,plott="NFKB.n",plotx="logtmax",color="dist") {
+auc_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist") {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
@@ -328,9 +359,16 @@ auc_plot <- function(dflist,plott="NFKB.n",plotx="logtmax",color="dist") {
     color <- substring(color,first=4)
     color_v <- log(valuedf[[color]])
     logs <- "_log_"
-  } else {
+    name <- paste("Log",color)
+  } else if (substr(color,1,4) == "fold") {
+    color <- substring(color,first=5)
+    color_v <- (valuedf[[color]])/value
+    logs <- "_fold_"
+    name <- paste("Fold",color)
+  }else {
     color_v <- valuedf[[color]]
     logs <- "_"
+    name <- color
   }
   
   
@@ -338,16 +376,24 @@ auc_plot <- function(dflist,plott="NFKB.n",plotx="logtmax",color="dist") {
     x <- substring(plotx,first=4)
     x_v <- log(valuedf[[x]])
     logs_x <- "_log_"
+  } else if (substr(plotx,1,4) == "fold") {
+    x <- substring(plotx,first=5)
+    x_v <- (valuedf[[x]])/value
+    logs_x <- "_fold_"
+    namex <- paste("Fold",x)
   } else {
     x <- plotx
     x_v <- valuedf[[x]]
     logs_x <- "_"
   }
   
+  mp <- (min(color_v) + max(color_v) )/2
+  
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
-    geom_point(aes(y=auc_val, color=color_v))+
-    scale_colour_gradient(high="#FF0000", low = "#0000FF")
+    geom_point(shape = 21,stroke=0.5, color="black",aes(y=auc_val,fill=color_v))+
+    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name=name)+
+    xlab(namex)
   
   ggsave(filename=paste("AUC_",plott,logs_x,x,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
   
@@ -355,7 +401,7 @@ auc_plot <- function(dflist,plott="NFKB.n",plotx="logtmax",color="dist") {
 }
 
 ### Plotting response times of all plott curves
-response_plot <- function(dflist,plott="NFKB.n",plotx="logtmax",color="dist",t=800) {
+response_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist",t=800) {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
@@ -366,9 +412,16 @@ response_plot <- function(dflist,plott="NFKB.n",plotx="logtmax",color="dist",t=8
     color <- substring(color,first=4)
     color_v <- log(valuedf[[color]])
     logs <- "_log_"
+    name <- paste("Log",color)
+  } else if (substr(color,1,4) == "fold") {
+    color <- substring(color,first=5)
+    color_v <- (valuedf[[color]])/value
+    logs <- "_fold_"
+    name <- paste("Fold",color)
   } else {
     color_v <- valuedf[[color]]
     logs <- "_"
+    name <- color
   }
   
   
@@ -376,20 +429,29 @@ response_plot <- function(dflist,plott="NFKB.n",plotx="logtmax",color="dist",t=8
     x <- substring(plotx,first=4)
     x_v <- log(valuedf[[x]])
     logs_x <- "_log_"
+    namex <- paste("Log",x)
+  } else if (substr(plotx,1,4) == "fold") {
+    x <- substring(plotx,first=5)
+    x_v <- (valuedf[[x]])/value
+    logs_x <- "_fold_"
+    namex <- paste("Fold",x)
   } else {
     x <- plotx
     x_v <- valuedf[[x]]
     logs_x <- "_"
+    namex <- x
   }
   
   
   co <- lm(resptimes ~ x_v, as.data.frame(valuedf))$coefficients
+  mp <- (min(color_v) + max(color_v) )/2
   
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
-    geom_point(aes(y=resptimes, color=color_v))+
+    geom_point(shape = 21,stroke=0.5, color="black",aes(y=resptimes,fill=color_v))+
     geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
-    scale_colour_gradient(high="#FF0000", low = "#0000FF")
+    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name=name)+
+    xlab(namex)
   
   ggsave(filename=paste("response_time_",plott,logs_x,x,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
   
