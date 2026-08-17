@@ -405,7 +405,7 @@ auc_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist") {
   
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
-    geom_point(shape = 21,stroke=0.5, color="black",aes(y=auc_val,fill=color_v))+
+    geom_point(shape = pointstyle(),stroke=0.5, color="black",aes(y=auc_val,fill=color_v))+
     scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name=name)+
     xlab(namex)
   
@@ -462,7 +462,7 @@ response_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist",t=
   
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
-    geom_point(shape = 21,stroke=0.5, color="black",aes(y=resptimes,fill=color_v))+
+    geom_point(shape = pointstyle(),stroke=0.5, color="black",aes(y=resptimes,fill=color_v))+
     geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
     scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name=name)+
     xlab(namex)
