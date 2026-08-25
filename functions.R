@@ -30,7 +30,7 @@ setup <- function() {
 }
 
 ### Initializing the desired XML File
-init <- function(parameter, seed = "42", sd_s=2) {
+init <- function(parameter, seed = "42", sd_s=10/3) {
   ### Preparation
   file_xml <<- read_xml("model_base.xml")
   
@@ -63,13 +63,15 @@ init <- function(parameter, seed = "42", sd_s=2) {
 #Recursive function, drawing parameter values from lognormal distribution
 make_expression <- function(i) {
   if (i == 36){
-    return (paste("if(cell.id==36,",rlnorm(1,log(value^2/(sqrt(value^2+sd_s^2))),sqrt(log(1+(sd_s^2/value^2)))),",",value,")",sep=''))
+    # return (paste("if(cell.id==36,",rlnorm(1,log(value^2/(sqrt(value^2+sd_s^2))),sqrt(log(1+(sd_s^2/value^2)))),",",value,")",sep=''))
+    return (paste("if(cell.id==36,",rnorm(1,value,sd_s),",",value,")",sep=''))
   }
   # else if (i == 20){
   #   return (paste("if(cell.id==20,",value,",",make_expression(i+1),")",sep=''))
   # }
   else {
-    expression <- paste("if(cell.id==",i,",",rlnorm(1,log(value^2/(sqrt(value^2+sd_s^2))),sqrt(log(1+(sd_s^2/value^2)))),",",make_expression(i+1),")",sep='')
+    # expression <- paste("if(cell.id==",i,",",rlnorm(1,log(value^2/(sqrt(value^2+sd_s^2))),sqrt(log(1+(sd_s^2/value^2)))),",",make_expression(i+1),")",sep='')
+    expression <- paste("if(cell.id==",i,",",rnorm(1,1,sd_s),",",make_expression(i+1),")",sep='')
     return (expression)
   }
 }
