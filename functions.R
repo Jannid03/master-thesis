@@ -86,7 +86,7 @@ run <- function(n=TRUE,num=1) {
     last <- as.numeric(substr(dir(output)[length(dir(output))],5,8))
   }
   
-  for (i in 1:n) {
+  for (i in 1:1) {
     # dir <- paste(output,"/",parameter,"=",round(mod_val,3),sep="")
     output <- paste(output,"/run_",formatC(last+i,width=3,flag='0'),sep="")
     dir.create((output), recursive = TRUE)
@@ -146,7 +146,7 @@ auc <- function(x) {
 all_auc <- function(value_df, val="NFKB.n") {
   erg <- c()
   for(i in (1:36)) {
-    df <- value_df |> filter(cell.id == i)
+    df <- value_df |> filter(cell.id == i) |> filter(time >-1)
     x <- df[[val]]
     erg <- c(erg,auc(x))
   }
@@ -289,12 +289,12 @@ all_cells <- function(dflist,ploty="NFKB.n", color="foldtmax", scaled=FALSE) {
   }
   
   pl <- valuedf |>
-    ggplot(mapping=aes(x=time, y=.data[[ploty]], group=cell.id))+
+    ggplot()+
     #geom_line(linewidth=0.55, color="black")+
-    geom_line(aes(colour=color_v),linetype=linestyle())+
-    scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name=name)+
-    geom_vline(xintercept=0, alpha=0.5, linetype="dashed")+
-    geom_vline(xintercept=60,alpha=0.5, linetype="dashed")
+    geom_line(aes(colour=color_v,x=time, y=.data[[ploty]], group=cell.id),linetype=linestyle())+
+    scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=mp, name=name)+
+    geom_vline(xintercept=0, alpha=0.25, linetype=1)+
+    geom_vline(xintercept=60,alpha=0.25, linetype=1)
   
   
   ggsave(filename=paste("all_cells_",ploty,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
@@ -322,7 +322,7 @@ maxima <- function(dflist,plott="NFKB.n",plotx="foldtmax",scalex=FALSE) {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
-  valuedf <- valuedf |> group_by(cell.id) |> slice_max(.data[[plott]])
+  valuedf <- valuedf |> group_by(cell.id) |> filter(time >-1) |> slice_max(.data[[plott]])
   if(substr(plotx,1,3) == "log") {
     x <- substring(plotx,first=4)
     x_v <- log(valuedf[[x]])
@@ -350,9 +350,9 @@ maxima <- function(dflist,plott="NFKB.n",plotx="foldtmax",scalex=FALSE) {
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
     ggtitle(paste(plott," Maxima"))+
-    geom_point(shape = pointstyle(),stroke=0.5, color="black",aes(y=time,fill=.data[[plott]]))+
+    geom_point(shape = pointstyle(),stroke=0.0, color="black",aes(y=time,fill=.data[[plott]]))+
     geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
-    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name="NFKB value")+
+    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=mp, name="NFKB value")+
     xlab(namex)
   
   ggsave(filename=paste("maximum_",plott,logs,x,".png"),path = save_path, width=3000, height=2000, units="px")
@@ -405,8 +405,8 @@ auc_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist") {
   
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
-    geom_point(shape = pointstyle(),stroke=0.5, color="black",aes(y=auc_val,fill=color_v))+
-    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name=name)+
+    geom_point(shape = pointstyle(),stroke=0.0, color="black",aes(y=auc_val,fill=color_v))+
+    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=mp, name=name)+
     xlab(namex)
   
   ggsave(filename=paste("AUC_",plott,logs_x,x,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
@@ -462,9 +462,9 @@ response_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist",t=
   
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
-    geom_point(shape = pointstyle(),stroke=0.5, color="black",aes(y=resptimes,fill=color_v))+
+    geom_point(shape = pointstyle(),stroke=0.0, color="black",aes(y=resptimes,fill=color_v))+
     geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
-    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#FFFFFF", midpoint=mp, name=name)+
+    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=mp, name=name)+
     xlab(namex)
   
   ggsave(filename=paste("response_time_",plott,logs_x,x,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
