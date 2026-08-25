@@ -294,7 +294,7 @@ all_cells <- function(dflist,ploty="NFKB.n", color="foldtmax", scaled=FALSE) {
     ggplot()+
     #geom_line(linewidth=0.55, color="black")+
     geom_line(aes(colour=color_v,x=time, y=.data[[ploty]], group=cell.id),linetype=linestyle())+
-    scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=mp, name=name)+
+    scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=1, name=name)+
     geom_vline(xintercept=0, alpha=0.25, linetype=1)+
     geom_vline(xintercept=60,alpha=0.25, linetype=1)
   
@@ -354,7 +354,7 @@ maxima <- function(dflist,plott="NFKB.n",plotx="foldtmax",scalex=FALSE) {
     ggtitle(paste(plott," Maxima"))+
     geom_point(shape = pointstyle(),stroke=0.0, color="black",aes(y=time,fill=.data[[plott]]))+
     geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
-    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=mp, name="NFKB value")+
+    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=1, name="NFKB value")+
     xlab(namex)
   
   ggsave(filename=paste("maximum_",plott,logs,x,".png"),path = save_path, width=3000, height=2000, units="px")
@@ -408,7 +408,7 @@ auc_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist") {
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
     geom_point(shape = pointstyle(),stroke=0.0, color="black",aes(y=auc_val,fill=color_v))+
-    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=mp, name=name)+
+    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=1, name=name)+
     xlab(namex)
   
   ggsave(filename=paste("AUC_",plott,logs_x,x,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
@@ -466,7 +466,7 @@ response_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist",t=
     ggplot(mapping=aes(x=x_v))+
     geom_point(shape = pointstyle(),stroke=0.0, color="black",aes(y=resptimes,fill=color_v))+
     geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
-    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=mp, name=name)+
+    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=1, name=name)+
     xlab(namex)
   
   ggsave(filename=paste("response_time_",plott,logs_x,x,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
