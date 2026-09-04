@@ -9,8 +9,8 @@ linestyle <- function () {
 }
 
 pointstyle <- function() {
-  n <- rep(21,36)
-  n[20] <- 4
+  n <- rep(16,36)
+  n[20] <- 8
   
   return(n)
 }
@@ -351,9 +351,9 @@ maxima <- function(dflist,plott="NFKB.n",plotx="foldtmax",ploty="time",scalex=FA
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
     ggtitle(paste(plott," Maxima"))+
-    geom_point(shape = pointstyle(),stroke=0.0, color="black",aes(y=.data[[ploty]],fill=.data[[plott]]))+
+    geom_point(shape = pointstyle(),stroke=0.0, fill="black",aes(y=.data[[ploty]],color=.data[[plott]]))+
     stat_smooth(method = "lm", col="black",alpha=0.5, linetype="dashed",linewidth=0.5,se=FALSE,aes(y=.data[[ploty]]))+
-    scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=1, name="NFKB value")+
+    scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=1, name="NFKB value")+
     xlab(namex)
   
   ggsave(filename=paste("maximum_",plott,"_",ploty,logs,x,".png"),path = save_path, width=3000, height=2000, units="px")
