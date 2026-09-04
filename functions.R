@@ -10,7 +10,7 @@ linestyle <- function () {
 
 pointstyle <- function() {
   n <- rep(21,36)
-  n[20] <- 22
+  n[20] <- 4
   
   return(n)
 }
@@ -320,7 +320,7 @@ kymograph <- function(dflist,plott="NFKB.n",ploty="dist") {
 }
 
 ### Plotting time of Maximas of plott vs. plotx
-maxima <- function(dflist,plott="NFKB.n",plotx="foldtmax",scalex=FALSE) {
+maxima <- function(dflist,plott="NFKB.n",plotx="foldtmax",ploty="time",scalex=FALSE) {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
@@ -347,17 +347,16 @@ maxima <- function(dflist,plott="NFKB.n",plotx="foldtmax",scalex=FALSE) {
   }
   
   mp <- (min(valuedf[[plott]]) + max(valuedf[[plott]]) )/2
-  co <- lm(time ~ x_v, as.data.frame(valuedf))$coefficients
 
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
     ggtitle(paste(plott," Maxima"))+
-    geom_point(shape = pointstyle(),stroke=0.0, color="black",aes(y=time,fill=.data[[plott]]))+
-    geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
+    geom_point(shape = pointstyle(),stroke=0.0, color="black",aes(y=.data[[ploty]],fill=.data[[plott]]))+
+    stat_smooth(method = "lm", col="black",alpha=0.5, linetype="dashed",linewidth=0.5,se=FALSE,aes(y=.data[[ploty]]))+
     scale_fill_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=1, name="NFKB value")+
     xlab(namex)
   
-  ggsave(filename=paste("maximum_",plott,logs,x,".png"),path = save_path, width=3000, height=2000, units="px")
+  ggsave(filename=paste("maximum_",plott,"_",ploty,logs,x,".png"),path = save_path, width=3000, height=2000, units="px")
   
   return(pl)
 }
