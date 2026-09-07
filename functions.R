@@ -9,8 +9,15 @@ linestyle <- function () {
 }
 
 pointstyle <- function() {
-  n <- rep(16,36)
-  n[20] <- 8
+  n <- rep("•",36)
+  n[20] <- "*"
+  
+  return(n)
+}
+
+pointsize <- function() {
+  n <- rep(5,36)
+  n[20] <- 5
   
   return(n)
 }
@@ -274,7 +281,7 @@ standard_plots <- function(dflist, cellid = 20) {
 }
 
 ### Plotting all curves of all cell ids 
-all_cells <- function(dflist,ploty="NFKB.n", color="foldtmax", scaled=FALSE) {
+all_cells <- function(dflist,ploty="NFKB.n", color="tmax", scaled=FALSE) {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
@@ -335,7 +342,7 @@ kymograph <- function(dflist,plott="NFKB.n",ploty="dist") {
 }
 
 ### Plotting time of Maximas of plott vs. plotx
-maxima <- function(dflist,color="NFKB.n",plotx="foldtmax",ploty="time",max="NFKB.n") {
+maxima <- function(dflist,color="NFKB.n",plotx="tmax",ploty="time",max="NFKB.n") {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
@@ -363,12 +370,12 @@ maxima <- function(dflist,color="NFKB.n",plotx="foldtmax",ploty="time",max="NFKB
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
     ggtitle(paste(color," Maxima"))+
-    geom_point(shape = pointstyle(),stroke=0.0, fill="black",aes(y=.data[[ploty]],color=.data[[color]]))+
+    geom_point(shape = pointstyle(),aes(y=.data[[ploty]],color=.data[[color]]),size=pointsize())+
     stat_smooth(method = "lm", col="black",alpha=0.5, linetype="dashed",linewidth=0.5,se=FALSE,aes(y=.data[[ploty]]))+
     scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=midp(color), name=paste(color," value"))+
     xlab(namex)
 
-  ggsave(filename=paste("maximum_",color,"_",ploty,logs,x,".png"),path = save_path, width=3000, height=2000, units="px")
+  ggsave(filename=paste("maximum_",color,"_",ploty,logs,x,".jpg"),plot=pl,path = save_path,height=2000,width=3000,dpi=600,unit="px")
   
   return(pl)
 }
@@ -418,7 +425,7 @@ auc_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist") {
   
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
-    geom_point(shape = pointstyle(),stroke=0.0, fill="black",aes(y=auc_val,color=color_v))+
+    geom_point(shape = pointstyle(),stroke=0.0, fill="black",aes(y=auc_val,color=color_v),size=pointsize())+
     scale_color_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=midp(color), name=name)+
     xlab(namex)
   
@@ -475,7 +482,7 @@ response_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist",t=
   
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
-    geom_point(shape = pointstyle(),stroke=0.0, fill="black",aes(y=resptimes,color=color_v))+
+    geom_point(shape = pointstyle(),stroke=0.0, fill="black",aes(y=resptimes,color=color_v),size=pointsize())+
     geom_line(mapping=aes(y=co[1]+co[2]*x_v), alpha=0.5, linetype="dashed")+
     scale_color_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=midp(color), name=name)+
     xlab(namex)
