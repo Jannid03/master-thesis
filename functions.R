@@ -22,6 +22,117 @@ pointsize <- function() {
   return(n)
 }
 
+load_all <- function(param="tmax") {
+  dfs <- c()
+  for (i in 1:300){
+    print(i)
+    value_df <- load(parameter = param, runn = i)
+    
+    dfs <- c(dfs, value_df)
+  }
+  
+  print("Loading done")
+  
+  return(dfs)
+}
+
+#### Aggregate multiple runs ####
+all_analysis <- function(dfs,param="tmax") {
+  
+  vals <- c()
+  ret <- data.frame()
+  
+  for (i in 1:300){
+    loc <- data.frame(dummy=rep(1,36))
+    print(i)
+    value_df <- dfs[i*3-2]
+    
+    ### Getting param
+    tf <- value_df$df |> group_by(cell.id) |> filter(time==1)
+    dfl <- data.frame(tf[[param]])
+    loc <- cbind(loc,dfl)
+    
+    ### All cells max NFKB and time
+    tf <- value_df$df |> group_by(cell.id) |> filter(time>-1) |> slice_max(NFKB.n)
+    dfl <- data.frame(NFKB_time=tf[["time"]], max_NFKB=tf[["NFKB.n"]])
+    loc <- cbind(loc,dfl)
+    
+    ### All cells NFKB end as percentage
+    tf <- value_df$df |> group_by(cell.id) |> filter(time==800)
+    dfl <- data.frame(final_NFKB=tf[["NFKB.n"]])
+    loc <- cbind(loc,dfl)
+    
+    ###All cells eTNF max and end
+    tf <- value_df$df |> group_by(cell.id) |> filter(time>-1) |> slice_max(eTNFa)
+    tf2 <- value_df$df |> group_by(cell.id) |> filter(time==800)
+    dfl <- data.frame(eTNFa_time=tf[["time"]], max_eTNFa=tf[["eTNFa"]],eTNFa_final=tf2[["eTNFa"]])
+    loc <- cbind(loc,dfl)
+    
+    ###All cells activated_frac end
+    tf <- value_df$df |> group_by(cell.id) |> filter(time==800)
+    dfl <- data.frame(TNFR_frac_end=tf[["activated_frac"]])
+    loc <- cbind(loc,dfl)
+    
+    ###DIst
+    tf <- value_df$df |> group_by(cell.id) |> filter(time==800)
+    dfl <- data.frame(dist=tf[["dist"]])
+    loc <- cbind(loc,dfl)
+
+    ###Order
+    tf <- value_df$df |> group_by(cell.id) |> filter(time==800)
+    dfl <- data.frame(order=tf[["order"]])
+    loc <- cbind(loc,dfl)
+    
+    
+    
+    ### Avergae of first time point vs. average of last time point
+    # first <- value_df$df |> group_by(cell.id )|> filter(time == -1) |> select(NFKB.n,cell.id)
+    # end <- value_df$df |> group_by(cell.id )|> filter(time == 800) |> select(NFKB.n,cell.id)
+    # print(mean(first[["NFKB.n"]]))
+    # print(mean(end[["NFKB.n"]]))
+    # vals <- c(vals, mean(end[["NFKB.n"]])/mean(first[["NFKB.n"]]))
+    
+    
+    ### Which curves are under their pre time maximum?
+    # max_pre <- value_df$df |> group_by(cell.id) |> filter(time <= -1) |> slice_max(NFKB.n)
+    # 
+    # max_post <- value_df$df |> group_by(cell.id) |> filter(time > -1) |> slice_max(NFKB.n)
+    # 
+    # vals <- c(vals, sum(max_pre[["NFKB.n"]]*0.9 > max_post[["NFKB.n"]]))
+    
+    ### Which curves are inactive (less than 10% over value at t=0 )
+    # max_pre <- value_df$df |> group_by(cell.id) |> filter(time > -1) |> filter(time <1) |> slice_max(NFKB.n)
+    # 
+    # max_post <- value_df$df |> group_by(cell.id) |> filter(time >= 1) |> slice_max(NFKB.n)
+    # 
+    # vals <- c(vals, sum(max_pre[["NFKB.n"]]*1.1 > max_post[["NFKB.n"]]))
+    
+    ### 
+    # max_pre <- value_df$df |> group_by(cell.id) |> filter(time > -1) |> filter(time <1) |> slice_max(NFKB.n)
+    # 
+    # max_post <- value_df$df |> group_by(cell.id) |> filter(time == 800) |> slice_max(NFKB.n)
+    # 
+    # vals <- c(vals, sum(max_pre[["NFKB.n"]]*1.1 > max_post[["NFKB.n"]]))
+    
+    
+    ###
+    # max_post <- value_df$df |> group_by(cell.id) |> filter(time == 800) |> slice_max(NFKB.n)
+    # 
+    # vals <- c(vals, sum(max_post[["NFKB.n"]]<0.1*0.01))
+    # print(loc)
+    if(i==1) {
+     ret <- loc
+    }
+    else {
+      ret <- rbind(ret,loc)
+    }
+  }
+  
+  ret <- cbind(ret,data.frame("run"=rep(1:300,each=36),"cell.id"=rep(1:36,300)),"var"=as.factor(rep(c(10,25,50),each=3600)))
+  names(ret)[2] <- param
+  return(ret[-1])
+}
+
 ###Setup for libraries etc.
 setup <- function() {
   library(ggplot2)
@@ -44,12 +155,12 @@ init <- function(parameter, seed = "42", sd_s=0.1/3) {
   set.seed(seed)
   parameter <<- parameter
   if(parameter != "base") {
-    sd_s <<- sd_s
+    # sd_s <<- sd_s
     path <<- paste("//CellTypes//Property[@symbol=","\"",parameter,"\"]",sep = "")
     value <<- xml_double(xml_find_all(file_xml,paste(path, "//@value")))
     
     ### Cells
-    expr <- make_expression(1)
+    expr <- make_expression(1,sd_s)
     
     expr_path <<- (xml_find_first(file_xml,"//CellPopulations//Population"))
     xml_add_child(expr_path,"InitProperty")
@@ -68,17 +179,20 @@ init <- function(parameter, seed = "42", sd_s=0.1/3) {
 }
 
 #Recursive function, drawing parameter values from lognormal distribution
-make_expression <- function(i) {
+make_expression <- function(i,sd) {
+  d <- value*rnorm(1,1,sd)
+  # print(typeof(d))
+  # tmaxes <<- c(tmaxes,d)
   if (i == 36){
     # return (paste("if(cell.id==36,",rlnorm(1,log(value^2/(sqrt(value^2+sd_s^2))),sqrt(log(1+(sd_s^2/value^2)))),",",value,")",sep=''))
-    return (paste("if(cell.id==36,",value*rnorm(1,1,sd_s),",",value,")",sep=''))
+    return (paste("if(cell.id==36,",d,",",value,")",sep=''))
   }
   # else if (i == 20){
   #   return (paste("if(cell.id==20,",value,",",make_expression(i+1),")",sep=''))
   # }
   else {
     # expression <- paste("if(cell.id==",i,",",rlnorm(1,log(value^2/(sqrt(value^2+sd_s^2))),sqrt(log(1+(sd_s^2/value^2)))),",",make_expression(i+1),")",sep='')
-    expression <- paste("if(cell.id==",i,",",value*rnorm(1,1,sd_s),",",make_expression(i+1),")",sep='')
+    expression <- paste("if(cell.id==",i,",",d,",",make_expression(i+1,sd),")",sep='')
     return (expression)
   }
 }
@@ -206,6 +320,8 @@ midp <- function(color) {
     return(0)
   } else if (color == "eTNFa") {
     return(0.015)
+  } else if (color == "t11") {
+    return(37.2759372)
   } else {
     return(1)
   }
