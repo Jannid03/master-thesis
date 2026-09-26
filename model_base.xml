@@ -18,7 +18,7 @@
         <SpaceSymbol symbol="space"/>
     </Space>
     <Time>
-        <StartTime value="-200"/>
+        <StartTime value="-250"/>
         <StopTime value="800"/>
         <TimeSymbol symbol="time"/>
         <RandomSeed value="42"/>
@@ -63,6 +63,7 @@
                 <Symbol symbol-ref="TNFa_TNFR"/>
                 <Symbol symbol-ref="TNFR.i"/>
                 <Symbol symbol-ref="tmax"/>
+                <Symbol symbol-ref="t11"/>
             </Input>
             <Output>
                 <TextOutput file-format="csv"/>
@@ -310,7 +311,6 @@
                 <Constant symbol="k2a" name="export of nuclear NF-KB|IKBA into cytoplasm" value="0.828"/>
                 <Constant symbol="tp1a" name="import of IKBA into nucleus" value="0.018"/>
                 <Constant symbol="a4n" name="association of nucleus IKBA and nucleus NF-KB" value="30.0"/>
-                <Constant symbol="tr4a" name="NF-KB-dependent transcription of IKBA mRNA " value="1.386"/>
                 <Constant symbol="tr2a" name="constitutive transcription of IKBA mRNA" value="0.0001848"/>
                 <Constant symbol="tr3a" name="degradation of IKBA mRNA" value="0.0336"/>
                 <Constant symbol="tr1a" name="synthesis of IKBA protein" value="0.2448"/>
@@ -322,7 +322,6 @@
                 <Constant symbol="s20" value="7.7e-4*60"/>
                 <Constant symbol="d0" value="5e-5*60"/>
                 <Constant symbol="t9" value="1"/>
-                <Constant symbol="t11" value="37.2759372"/>
                 <Constant symbol="t4" value="2e-4*60"/>
                 <Constant symbol="t7" value="0.15"/>
                 <Constant symbol="d20" value="0.01"/>
@@ -423,6 +422,8 @@
             <Property symbol="order" value="0"/>
             <Property symbol="e1" value="4.4e-4*60"/>
             <Property symbol="s0" value="1680"/>
+            <Property symbol="t11" value="37.2759372"/>
+            <Property symbol="tr4a" name="NF-KB-dependent transcription of IKBA mRNA " value="1.386"/>
             <SurfaceConstraint target="0.1" strength="1" mode="aspherity"/>
             <VolumeConstraint target="500" strength="1"/>
             <Event compute-time="on-trigger">
