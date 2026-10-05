@@ -22,9 +22,9 @@ pointsize <- function() {
   return(n)
 }
 
-load_all <- function(param="tmax") {
+load_all <- function(param="tmax", until=300) {
   dfs <- c()
-  for (i in 1:300){
+  for (i in 1:until){
     print(i)
     value_df <- load(parameter = param, runn = i)
     
@@ -38,11 +38,11 @@ load_all <- function(param="tmax") {
 
 #### Aggregate multiple runs ####
 all_analysis <- function(dfs,param="tmax") {
-  
+  print(length(dfs))
   vals <- c()
   ret <- data.frame()
   
-  for (i in 1:300){
+  for (i in 1:400){
     loc <- data.frame(dummy=rep(1,36))
     print(i)
     value_df <- dfs[i*3-2]
@@ -128,11 +128,12 @@ all_analysis <- function(dfs,param="tmax") {
     }
   }
   
-  ret <- cbind(ret,data.frame("run"=rep(1:300,each=36),"cell.id"=rep(1:36,300)),"var"=as.factor(rep(c(10,25,50),each=3600)))
+  ret <- cbind(ret,data.frame("run"=rep(1:400,each=36),"cell.id"=rep(1:36,400)),"var"=as.factor(rep(c(10,25,50,0),each=3600)))
   names(ret)[2] <- param
   return(ret[-1])
 }
 
+#### SETUP ####
 ###Setup for libraries etc.
 setup <- function() {
   library(ggplot2)
@@ -143,6 +144,7 @@ setup <- function() {
   library(EnvStats)
   library(patchwork)
   library(ggpubr)
+  library(GGally)
   
   print("Setup done")
 }

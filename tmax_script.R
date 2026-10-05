@@ -6,10 +6,17 @@ setup()
 ## For base simulation
 #init("base",43)
 init("tmax",1,0.1/2) #12
-run(FALSE)
+run(n=TRUE,999)
+dfs_base<- load_all(param = "base", until=100)
 
 dfs_tmax <- load_all()
-result_all_tmax <- all_analysis(dfs_tmax, param="tmax")
+result_all_tmax <- all_analysis(append(dfs_tmax,dfs_base),param="tmax")
+
+dfs_t11<- load_all(param = "t11")
+result_all_t11 <- all_analysis(append(dfs_t11,dfs_base), param="t11")
+
+
+result_all_tmax |> filter(var==0)
 
 
 # ggplot(data=results)+
@@ -28,7 +35,7 @@ result_all_tmax <- all_analysis(dfs_tmax, param="tmax")
 #   geom_jitter(mapping=aes(x=var,y=percentage_under_10,alpha=0.5))
 
 
-### All cells all runs
+#### All cells all runs ####
 ####Final NFKB
 #DIst
 result_all |>
@@ -189,8 +196,8 @@ summary(time_eTNFa_model)
 max_eTNFa_model <- lm(max_eTNFa ~  norm_tmax+norm_dist, data=model)
 summary(max_eTNFa_model)
 
-### Run wise
-summ <- result_all |> group_by(run) |> summarise(mean_NFKB_high = mean(max_NFKB), vars = first(var), avg_tmax = mean(tmax), mean_NFKB_time = mean(NFKB_time), avg_eTNFa = mean(max_eTNFa), avg_eTNFa_time = mean(eTNFa_time),sd_tmax = sd(tmax), sd_NFKB_time = sd(NFKB_time), sd_eTNFa = sd(max_eTNFa), sd_eTNFa_time = sd(eTNFa_time),sd_NFKB_high = sd(max_NFKB))
+#### Run wise####
+summ <- result_all_tmax |> filter(cell.id!=20) |> group_by(run) |> summarise(avg_NFKB_high = mean(max_NFKB), vars = first(var), avg_tmax = mean(tmax), avg_NFKB_time = mean(NFKB_time), avg_eTNFa = mean(max_eTNFa), avg_eTNFa_time = mean(eTNFa_time),sd_tmax = sd(tmax), sd_NFKB_time = sd(NFKB_time), sd_eTNFa = sd(max_eTNFa), sd_eTNFa_time = sd(eTNFa_time),sd_NFKB_high = sd(max_NFKB))
 
 #Vars vs avg_NFKB
 summ |>
@@ -201,46 +208,88 @@ summ |>
 #Avg TMAX vs avg_NFKB
 summ |>
   ggplot()+
-  geom_point(aes(x=avg_tmax,y=mean_NFKB_high, color=vars))
+  geom_point(aes(x=avg_tmax,y=avg_NFKB_high, color=vars))
+
+summ |>
+  ggplot(aes(x=vars,y=avg_NFKB_high, color=vars))+
+  geom_boxplot()+
+  stat_compare_means(comparisons=list(c("0","10"),c("0","25"),c("0","50")),label="p.signif")
+
+summ |>
+  ggplot(aes(x=vars,y=avg_NFKB_high, color=vars))+
+  geom_boxplot()+
+  stat_compare_means(method = "wilcox.test")
 
 #Avg TMAX vs avg_NFKB_time
 summ |>
   ggplot()+
-  geom_point(aes(x=avg_tmax,y=mean_NFKB_time, color=vars))
+  geom_point(aes(x=avg_tmax,y=avg_NFKB_time, color=vars))
+
+summ |>
+  ggplot(aes(x=vars,y=avg_NFKB_time, color=vars))+
+  geom_boxplot()+
+  stat_compare_means(comparisons=list(c("0","10"),c("0","25"),c("0","50")),label="p.signif")
 
 #Avg TMAX vs avg_eTNFa
 summ |>
   ggplot()+
   geom_point(aes(x=avg_tmax,y=avg_eTNFa, color=vars))
 
+summ |>
+  ggplot(aes(x=vars,y=avg_eTNFa, color=vars))+
+  geom_boxplot()+
+  stat_compare_means(comparisons=list(c("0","10"),c("0","25"),c("0","50")),label="p.signif")
+
 #Avg TMAX vs avg_eTNFa_time
 summ |>
   ggplot()+
   geom_point(aes(x=avg_tmax,y=avg_eTNFa_time, color=vars))
+
+summ |>
+  ggplot(aes(x=vars,y=avg_eTNFa_time, color=vars))+
+  geom_boxplot()+
+  stat_compare_means(comparisons=list(c("0","10"),c("0","25"),c("0","50")),label="p.signif")
 
 #sd TMAX vs sd_NFKB
 summ |>
   ggplot()+
   geom_point(aes(x=sd_tmax,y=sd_NFKB_high, color=vars))
 
+summ |>
+  ggplot(aes(x=vars,y=sd_NFKB_high, color=vars))+
+  geom_boxplot()+
+  stat_compare_means(comparisons=list(c("0","10"),c("0","25"),c("0","50")),label="p.signif")
+
 #sd TMAX vs sd_NFKB_time
 summ |>
-  ggplot()+
-  geom_point(aes(x=sd_tmax,y=sd_NFKB_time, color=vars))
+  ggplot(aes(x=vars,y=sd_NFKB_time, color=vars))+
+  geom_boxplot()+
+  stat_compare_means(comparisons=list(c("0","10"),c("0","25"),c("0","50")),label="p.signif")
 
 #sd TMAX vs sd_eTNFa
 summ |>
-  ggplot()+
-  geom_point(aes(x=sd_tmax,y=sd_eTNFa, color=vars))
+  ggplot(aes(x=vars,y=sd_eTNFa,color=vars))+
+  geom_boxplot()+
+  stat_compare_means(comparisons=list(c("0","10"),c("0","25"),c("0","50")),label="p.signif")
 
 #sd TMAX vs sd_eTNFa_time
 summ |>
-  ggplot()+
-  geom_point(aes(x=sd_tmax,y=sd_eTNFa_time, color=vars))
+  ggplot(aes(x=vars,y=sd_eTNFa_time, color=vars))+
+  geom_boxplot()+
+  stat_compare_means(comparisons=list(c("0","10"),c("0","25"),c("0","50")),label="p.signif")
 
+#sd TMAX vs avg_eTNFa_time
+summ |>
+  ggplot(aes(x=vars,y=avg_eTNFa_time, color=vars))+
+  geom_boxplot()+
+  stat_compare_means(comparisons=list(c("0","10"),c("0","25"),c("0","50")),label="p.signif")
+
+#### GGpairs####
+ggpairs(summ,columns=c("avg_tmax","avg_NFKB_high", "avg_eTNFa", "sd_NFKB_high"),aes(color=vars, alpha=.5, fill=vars), diag=list(continuous="barDiag"))
+ggpairs(result_all_tmax,columns=c("dist","tmax","max_NFKB","NFKB_time"),aes(color=var, alpha=.05))
 
 ###### Extra Plots ####
-value_df <- load(parameter = "t11", runn = 2) 
+value_df <- load(parameter = "t11", runn = 1) 
 standard_plots(value_df)
 ### all cells plotted
 all_cells(value_df, color="t11")
