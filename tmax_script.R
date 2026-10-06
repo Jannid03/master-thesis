@@ -2,109 +2,83 @@ setwd("D:/Uni/Masterarbeit/data")
 source("functions.R")
 setup()
 
-#base_df <- load(parameter = "base", runn=2)
-## For base simulation
-#init("base",43)
-init("tmax",1,0.1/2) #12
-run(n=TRUE,999)
+#### Loading all Data Frames ####
 dfs_base<- load_all(param = "base", until=100)
 
 dfs_tmax <- load_all()
 result_all_tmax <- all_analysis(append(dfs_tmax,dfs_base),param="tmax")
 
-dfs_t11<- load_all(param = "t11")
-result_all_t11 <- all_analysis(append(dfs_t11,dfs_base), param="t11")
-
-
-result_all_tmax |> filter(var==0)
-
-
-# ggplot(data=results)+
-#   geom_boxplot(mapping=aes(x=(var),y=average_rise))
-# 
-# ggplot(data=results)+
-#   geom_boxplot(mapping=aes(x=var,y=non_activated_premax))
-# 
-# ggplot(data=results)+
-#   geom_boxplot(mapping=aes(x=var,y=non_activated_t0))
-# 
-# ggplot(data=results)+
-#   geom_jitter(mapping=aes(x=var,y=non_activated_tfinal,alpha=0.5))
-# 
-# ggplot(data=results)+
-#   geom_jitter(mapping=aes(x=var,y=percentage_under_10,alpha=0.5))
-
 
 #### All cells all runs ####
 ####Final NFKB
 #DIst
-result_all |>
+result_all_tmax |>
 ggplot()+
   geom_point(aes(x=tmax,y=final_NFKB,color=dist))+
   facet_wrap(vars(var),ncol=1)+
   scale_color_gradient(high="#FF0000", low = "#0000FF")
 
 #Tmax
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=tmax,y=final_NFKB,color=tmax))+
   facet_wrap(vars(var),ncol=1)+
   scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e",name="tmax",midpoint=0.01)
 
-model <- result_all |> filter(cell.id !=20)
+model <- result_all_tmax |> filter(cell.id !=20)
 final_NFKB_model <- lm(final_NFKB ~ dist+tmax, data=model)
 summary(final_NFKB_model)
 
 ####Max NFKB
 #Dist
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=tmax,y=max_NFKB,color=dist))+
   facet_wrap(vars(var),ncol=1)+
   scale_color_gradient(high="#FF0000", low = "#0000FF")
 
 #Tmax
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=dist,y=max_NFKB,color=tmax))+
   facet_wrap(vars(var),ncol=1)+
   scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e",name="tmax",midpoint=0.01)
 
 #Time max NFKB
-result_all |> 
+result_all_tmax |> 
   ggplot()+
   geom_point(aes(x=tmax,y=NFKB_time,color=dist))+
   facet_wrap(vars(var),ncol=1)+
   scale_color_gradient(high="#FF0000", low = "#0000FF")
 
 #final eTNFa
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=tmax,y=eTNFa_final,color=dist))+
   facet_wrap(vars(var),ncol=1)+
   scale_color_gradient(high="#FF0000", low = "#0000FF")
 
 #max eTNFa
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=tmax,y=max_eTNFa,color=dist))+
   facet_wrap(vars(var),ncol=1)+
   scale_color_gradient(high="#FF0000", low = "#0000FF")
 
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=dist,y=max_eTNFa,color=tmax))+
   facet_wrap(vars(var),ncol=1)+
   scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e",name="tmax",midpoint=0.01)
 
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=order,y=max_eTNFa,color=tmax))+
   facet_wrap(vars(var),ncol=1)+
   scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e",name="tmax",midpoint=0.01)
 
 #Time max eTNFa
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=tmax,y=eTNFa_time,color=dist))+
   facet_wrap(vars(var),ncol=1)+
@@ -112,7 +86,7 @@ result_all |>
 
 
 #TNFR frac end
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=(tmax),y=TNFR_frac_end,color=dist))+
   facet_wrap(vars(var),ncol=1)+
@@ -122,26 +96,26 @@ result_all |>
 
 
 #Tmax vs Dist, color:max_NFKB
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=tmax,y=dist,color=max_NFKB))+
   scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e",name="NFKB value",midpoint=0.005)+
   facet_wrap(vars(var),ncol=1)
 
 #Tmax vs Dist, color:max_eTNFa
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=tmax,y=dist,color=max_eTNFa))+
   scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e",name="eTNFa value",midpoint=0.02)
 
 #Tmax vs Dist, color:last_NFKB
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=tmax,y=dist,color=final_NFKB))+
   scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e",name="NFKB value",midpoint=3e-10)
 
 #Tmax vs Dist, color:last_eTNFa
-result_all |>
+result_all_tmax |>
   ggplot()+
   geom_point(aes(x=tmax,y=dist,color=eTNFa_final))+
   scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e",name="eTNFa value",midpoint=3e-13)
@@ -460,26 +434,26 @@ response_plot(value_df,"eTNFa")
 # plot((seq(0,0.01,0.00001)),plnorm(seq(0,0.01,0.00001),log(m^2/(sqrt(m^2+v))),sqrt(log(1+(v/m^2)))))
 
 #### Präsi ####
-rlnorm(1,log(value^2/(sqrt(value^2+sd_s^2))),sqrt(log(1+(sd_s^2/value^2))))
-ggplot()+
-  geom_line(aes(x=log(seq(0,0.05,0.0001)),y=dlnorm((seq(0,0.05,0.0001)),log(0.01^2/(sqrt(0.001^2+0.01^2))),sqrt(log(1+(0.001^2/0.01^2)))),color="0.001"))+
-  geom_line(aes(x=log(seq(0,0.05,0.0001)),y=dlnorm((seq(0,0.05,0.0001)),log(0.01^2/(sqrt(0.01^2+0.01^2))),sqrt(log(1+(0.01^2/0.01^2)))),color="0.01"))+
-  geom_line(aes(x=log(seq(0,0.05,0.0001)),y=dlnorm((seq(0,0.05,0.0001)),log(0.01^2/(sqrt(0.1^2+0.01^2))),sqrt(log(1+(0.1^2/0.01^2)))),color="0.1"))+
-  ylab("Density")+
-  xlab("x")+
-  ggtitle("Lognormal distribution with mean = 0.01, differing vars")
-
-
-ggplot()+
-  geom_histogram(aes(log(rlnorm(10000,log(0.01^2/(sqrt(0.001^2+0.01^2))),sqrt(log(1+(0.001^2/0.01^2))))),color="0.001"))+
-  geom_histogram(aes(log(rlnorm(10000,log(0.01^2/(sqrt(0.01^2+0.01^2))),sqrt(log(1+(0.01^2/0.01^2))))),color="0.01"))+
-  geom_histogram(aes(log(rlnorm(10000,log(0.01^2/(sqrt(0.1^2+0.01^2))),sqrt(log(1+(0.1^2/0.01^2))))),color="0.1"))+
-  ylab("Density")+
-  xlab("x")+
-  ggtitle("Lognormal distribution with mean = 0.01, differing vars")
-
-
-ggplot()+
-  geom_line(aes(x=seq(0.5,1.5,0.01),y=dnorm(seq(0.5,1.5,0.01),1,0.2/2)))
-
-pnorm(1.1,1,0.1/3)-pnorm(0.9,1,0.1/3)
+# rlnorm(1,log(value^2/(sqrt(value^2+sd_s^2))),sqrt(log(1+(sd_s^2/value^2))))
+# ggplot()+
+#   geom_line(aes(x=log(seq(0,0.05,0.0001)),y=dlnorm((seq(0,0.05,0.0001)),log(0.01^2/(sqrt(0.001^2+0.01^2))),sqrt(log(1+(0.001^2/0.01^2)))),color="0.001"))+
+#   geom_line(aes(x=log(seq(0,0.05,0.0001)),y=dlnorm((seq(0,0.05,0.0001)),log(0.01^2/(sqrt(0.01^2+0.01^2))),sqrt(log(1+(0.01^2/0.01^2)))),color="0.01"))+
+#   geom_line(aes(x=log(seq(0,0.05,0.0001)),y=dlnorm((seq(0,0.05,0.0001)),log(0.01^2/(sqrt(0.1^2+0.01^2))),sqrt(log(1+(0.1^2/0.01^2)))),color="0.1"))+
+#   ylab("Density")+
+#   xlab("x")+
+#   ggtitle("Lognormal distribution with mean = 0.01, differing vars")
+# 
+# 
+# ggplot()+
+#   geom_histogram(aes(log(rlnorm(10000,log(0.01^2/(sqrt(0.001^2+0.01^2))),sqrt(log(1+(0.001^2/0.01^2))))),color="0.001"))+
+#   geom_histogram(aes(log(rlnorm(10000,log(0.01^2/(sqrt(0.01^2+0.01^2))),sqrt(log(1+(0.01^2/0.01^2))))),color="0.01"))+
+#   geom_histogram(aes(log(rlnorm(10000,log(0.01^2/(sqrt(0.1^2+0.01^2))),sqrt(log(1+(0.1^2/0.01^2))))),color="0.1"))+
+#   ylab("Density")+
+#   xlab("x")+
+#   ggtitle("Lognormal distribution with mean = 0.01, differing vars")
+# 
+# 
+# ggplot()+
+#   geom_line(aes(x=seq(0.5,1.5,0.01),y=dnorm(seq(0.5,1.5,0.01),1,0.2/2)))
+# 
+# pnorm(1.1,1,0.1/3)-pnorm(0.9,1,0.1/3)
