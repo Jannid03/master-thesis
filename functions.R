@@ -440,7 +440,7 @@ all_cells <- function(dflist,ploty="NFKB.n", color="tmax", scaled=FALSE) {
   }
   
   averages <- dflist$df |> filter(cell.id!=20) |> group_by(time) |> summarise(avg_line = mean(.data[[ploty]]))
-  print(averages[["avg_line"]])
+  # print(averages[["avg_line"]])
   
   pl <- valuedf |>
     ggplot()+
