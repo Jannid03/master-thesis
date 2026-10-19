@@ -83,7 +83,16 @@ all_analysis <- function(dfs,param="tmax") {
     dfl <- data.frame(order=tf[["order"]])
     loc <- cbind(loc,dfl)
     
+    ###Timepoint of 50% TNFR occupancy
+    tf <- value_df$df |> group_by(cell.id) |> filter(activated_frac >=0.5) |> slice_min(time)
+    dfl <- data.frame(TNFR_50=tf[["time"]])
+    loc <- cbind(loc,dfl)
     
+    ###All cells iTNFa max and time
+    tf <- value_df$df |> group_by(cell.id) |> filter(time>-1) |> slice_max(iTNFa)
+    tf2 <- value_df$df |> group_by(cell.id) |> filter(time==800)
+    dfl <- data.frame(iTNFa_time=tf[["time"]], max_iTNFa=tf[["iTNFa"]],iTNFa_final=tf2[["iTNFa"]])
+    loc <- cbind(loc,dfl)
     
     ### Avergae of first time point vs. average of last time point
     # first <- value_df$df |> group_by(cell.id )|> filter(time == -1) |> select(NFKB.n,cell.id)
@@ -430,10 +439,15 @@ all_cells <- function(dflist,ploty="NFKB.n", color="tmax", scaled=FALSE) {
     mp <- (min(color_v) + max(color_v) )/2
   }
   
+  averages <- dflist$df |> filter(cell.id!=20) |> group_by(time) |> summarise(avg_line = mean(.data[[ploty]]))
+  print(averages[["avg_line"]])
+  
   pl <- valuedf |>
     ggplot()+
     #geom_line(linewidth=0.55, color="black")+
-    geom_line(aes(colour=color_v,x=time, y=.data[[ploty]], group=cell.id),linetype=linestyle())+
+    geom_line(aes(x=time,group=cell.id, y=.data[[ploty]],colour=color_v),linetype=linestyle())+
+    #stat_summary(aes(x=time, y=.data[[ploty]]),geom="line", fun = "mean", color="black", size=0.5, linetype="dotted")+
+    geom_line(data=averages,aes(x=time,y=avg_line),linewidth=1,linetype="dotted")+
     scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=midp(color), name=name)+
     geom_vline(xintercept=0, alpha=0.25, linetype=1)+
     geom_vline(xintercept=60,alpha=0.25, linetype=1)
