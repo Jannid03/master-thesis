@@ -18,7 +18,7 @@
         <SpaceSymbol symbol="space"/>
     </Space>
     <Time>
-        <StartTime value="-250"/>
+        <StartTime value="-500"/>
         <StopTime value="800"/>
         <TimeSymbol symbol="time"/>
         <RandomSeed value="42"/>
@@ -64,6 +64,7 @@
                 <Symbol symbol-ref="TNFR.i"/>
                 <Symbol symbol-ref="tmax"/>
                 <Symbol symbol-ref="t11"/>
+                <Symbol symbol-ref="tr4a"/>
             </Input>
             <Output>
                 <TextOutput file-format="csv"/>
