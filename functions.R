@@ -1,11 +1,11 @@
 ##### Functions to use in the Script #####
 
 #### TECHNICAL ####
-linestyle <- function () {
+linestyle <- function (startt=-250) {
   n <- rep(1,36)
   n[20] <- 2
-  
-  return(rep(n,each=1051))
+  #print((-startt)+800+1)
+  return(rep(n,each=(-startt)+800+1))
 }
 
 pointstyle <- function() {
@@ -22,9 +22,9 @@ pointsize <- function() {
   return(n)
 }
 
-load_all <- function(param="tmax", until=300) {
+load_all <- function(param="tmax", from=1, until=300) {
   dfs <- c()
-  for (i in 1:until){
+  for (i in (from:until)){
     print(i)
     value_df <- load(parameter = param, runn = i)
     
@@ -74,8 +74,8 @@ all_analysis <- function(dfs,param="tmax") {
     loc <- cbind(loc,dfl)
     
     ###DIst
-    tf <- value_df$df |> group_by(cell.id) |> filter(time==800)
-    dfl <- data.frame(dist=tf[["dist"]])
+    tf <- value_df$df |> group_by(cell.id) |> summarise(avg_dist = mean(dist)) 
+    dfl <- data.frame(dist=tf[["avg_dist"]])
     loc <- cbind(loc,dfl)
 
     ###Order
@@ -92,6 +92,18 @@ all_analysis <- function(dfs,param="tmax") {
     tf <- value_df$df |> group_by(cell.id) |> filter(time>-1) |> slice_max(iTNFa)
     tf2 <- value_df$df |> group_by(cell.id) |> filter(time==800)
     dfl <- data.frame(iTNFa_time=tf[["time"]], max_iTNFa=tf[["iTNFa"]],iTNFa_final=tf2[["iTNFa"]])
+    loc <- cbind(loc,dfl)
+    
+    ###Activation time of NFKB
+    tf1 <- value_df$df |> group_by(cell.id) |> filter(time>-1) |> filter(NFKB.n > 0.0001) |> slice_min(time)
+    print(max(tf1[["time"]]))
+    tf2 <- value_df$df |> group_by(cell.id) |> filter(time>max(tf1[["time"]])) |> filter(NFKB.n < 0.0001) |> slice_min(time)
+    dfl <- data.frame(span=tf2[["time"]]-tf1[["time"]])
+    loc <- cbind(loc,dfl)
+    
+    ###Timepoint of 50% TNFR occupancy
+    tf <- value_df$df |> group_by(cell.id) |> filter(time >-1) |> slice_max(IKBA)
+    dfl <- data.frame(IKBA_time=tf[["time"]], IKBA = tf[["IKBA"]])
     loc <- cbind(loc,dfl)
     
     ### Avergae of first time point vs. average of last time point
@@ -254,8 +266,8 @@ load <- function(parameter="base", runn=-1) {
   
   cell_pos <- cell_pos |> group_by(time) |> mutate(new_dist = sqrt((cell.center.x-cell.center.x[20])^2+(cell.center.y-cell.center.y[20])^2))
   
-  df <- df |> mutate("dist" = cell_pos$dist)
-  df <- df |> mutate("order" = rep(cellorder,times = 1051))
+  df <- df |> mutate("dist" = cell_pos$new_dist)
+  df <- df |> mutate("order" = rep(cellorder,times = 1301))
   
   # df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
   
@@ -331,8 +343,10 @@ midp <- function(color) {
     return(0)
   } else if (color == "eTNFa") {
     return(0.015)
-  } else if (color == "t11") {
+  } else if (color == "tr4b") {
     return(37.2759372)
+  } else if (color == "tr4a") {
+      return(1.386)
   } else {
     return(1)
   }
@@ -407,12 +421,31 @@ standard_plots <- function(dflist, cellid = 20) {
   ggsave(filename=paste("cell_",cellid,"_TNFa.png",sep=''),path = save_path, width=3000, height=2000, units="px")
 }
 
+###Plotting with ggarange
+arranging <- function(dflist,color="tmax",ploty="NFKB.n",title=c("Test")) {
+  dfs <- c()
+  all_cols <- c()
+  for (i in 1:(length(dflist)/3)) {
+    dfs <- c(dfs,dflist[(i-1)*3+1])
+    all_cols <- c(all_cols,dflist[(i-1)*3+1]$df[[color]])
+  }
+  print(max(all_cols))
+  print(length(dfs))
+  plots <- c()
+  for (i in 1:(length(dfs))) {
+    plots <- c(plots, all_cells(dfs[i],startt=-5,color=color,ploty=ploty,lims=c(max(all_cols),min(all_cols)),title=title[i]))
+  }
+  
+  return(plots)
+}
+
 ### Plotting all curves of all cell ids 
-all_cells <- function(dflist,ploty="NFKB.n", color="tmax", scaled=FALSE) {
+all_cells <- function(dflist,ploty="NFKB.n", color="tmax", scaled=FALSE,startt=-250,lims=c(0,0),titlel="t") {
   valuedf <- dflist$df
   save_path <- dflist$save_path
+  print(valuedf)
   
-  valuedf <- valuedf |> group_by(cell.id)
+  valuedf <- valuedf |> filter(time >= startt) |>group_by(cell.id)
   
   if(substr(color,1,3) == "log") {
     color <- substring(color,first=4)
@@ -442,15 +475,22 @@ all_cells <- function(dflist,ploty="NFKB.n", color="tmax", scaled=FALSE) {
   averages <- dflist$df |> filter(cell.id!=20) |> group_by(time) |> summarise(avg_line = mean(.data[[ploty]]))
   # print(averages[["avg_line"]])
   
+  if(lims[1]==0 && lims[2]==0) {
+    lims[1] <- max(color_v)
+    lims[2] <- min(color_v)
+  }
+  print(lims)
+  print(mp)
   pl <- valuedf |>
     ggplot()+
     #geom_line(linewidth=0.55, color="black")+
-    geom_line(aes(x=time,group=cell.id, y=.data[[ploty]],colour=color_v),linetype=linestyle())+
+    geom_line(aes(x=time,group=cell.id, y=.data[[ploty]],colour=color_v))+
     #stat_summary(aes(x=time, y=.data[[ploty]]),geom="line", fun = "mean", color="black", size=0.5, linetype="dotted")+
-    geom_line(data=averages,aes(x=time,y=avg_line),linewidth=1,linetype="dotted")+
-    scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=midp(color), name=name)+
+    #geom_line(data=averages,aes(x=time,y=avg_line),linewidth=1,linetype="dotted")+
+    scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=midp(color), name=name, limits=lims)+
     geom_vline(xintercept=0, alpha=0.25, linetype=1)+
-    geom_vline(xintercept=60,alpha=0.25, linetype=1)
+    geom_vline(xintercept=60,alpha=0.25, linetype=1)+
+    ggtitle(titlel)
   
   
   ggsave(filename=paste("all_cells_",ploty,logs,color,".png"),path = save_path, width=3000, height=2000, units="px")
@@ -478,7 +518,7 @@ maxima <- function(dflist,color="NFKB.n",plotx="tmax",ploty="time",max="NFKB.n")
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
-  valuedf <- valuedf |> group_by(cell.id) |> filter(time >-1) |> slice_max(.data[[max]])
+  valuedf <- valuedf |> group_by(cell.id) |> filter(time >-1) |> filter(cell.id!=20) |> slice_max(.data[[max]])
 
   if(substr(plotx,1,3) == "log") {
     x <- substring(plotx,first=4)
@@ -502,10 +542,18 @@ maxima <- function(dflist,color="NFKB.n",plotx="tmax",ploty="time",max="NFKB.n")
   pl <- valuedf |>
     ggplot(mapping=aes(x=x_v))+
     ggtitle(paste(color," Maxima"))+
-    geom_point(shape = pointstyle(),aes(y=.data[[ploty]],color=.data[[color]]),size=pointsize())+
+    #geom_point(shape = pointstyle(),aes(y=.data[[ploty]],color=.data[[color]]),size=pointsize())+
+    geom_point(aes(y=.data[[ploty]],color=.data[[color]]))+
     stat_smooth(method = "lm", col="black",alpha=0.5, linetype="dashed",linewidth=0.5,se=FALSE,aes(y=.data[[ploty]]))+
-    scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=midp(color), name=paste(color," value"))+
     xlab(namex)
+  
+  if(color=="dist") {
+    pl <- pl +
+      scale_colour_gradient(high="#FF0000", low = "#0000FF",name=paste(color," value"))
+  } else {
+    pl <- pl +
+      scale_colour_gradient2(high="#FF0000", low = "#0000FF", mid="#d9bd1e", midpoint=midp(color), name=paste(color," value"))
+  }
 
   ggsave(filename=paste("maximum_",color,"_",ploty,logs,x,".jpg"),plot=pl,path = save_path,height=2000,width=3000,dpi=600,unit="px")
   
