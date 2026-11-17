@@ -62,8 +62,8 @@
                 <Symbol symbol-ref="TNFR"/>
                 <Symbol symbol-ref="TNFa_TNFR"/>
                 <Symbol symbol-ref="TNFR.i"/>
-                <Symbol symbol-ref="tmax"/>
-                <Symbol symbol-ref="t11"/>
+                <Symbol symbol-ref="rRef"/>
+                <Symbol symbol-ref="tr4b"/>
                 <Symbol symbol-ref="tr4a"/>
             </Input>
             <Output>
@@ -105,7 +105,7 @@
                 <Symbol symbol-ref="dist"/>
                 <Symbol symbol-ref="s0"/>
                 <Symbol symbol-ref="e1"/>
-                <Symbol symbol-ref="tmax"/>
+                <Symbol symbol-ref="rRef"/>
             </Input>
             <Output>
                 <TextOutput file-format="csv"/>
@@ -153,14 +153,14 @@
                         <Time mode="current"/>
                     </Range>
                     <Color-bar>
-                        <Symbol symbol-ref="tmax"/>
+                        <Symbol symbol-ref="rRef"/>
                     </Color-bar>
                 </Plot>
                 <Plot time-step="-1">
                     <Style style="points"/>
                     <Terminal terminal="png"/>
                     <X-axis>
-                        <Symbol symbol-ref="tmax"/>
+                        <Symbol symbol-ref="rRef"/>
                     </X-axis>
                     <Y-axis>
                         <Symbol symbol-ref="eTNFa"/>
@@ -178,7 +178,7 @@
             <Input>
                 <Symbol symbol-ref="eTNFa"/>
                 <Symbol symbol-ref="TNFaflux"/>
-                <Symbol symbol-ref="tmax"/>
+                <Symbol symbol-ref="rRef"/>
             </Input>
             <Output>
                 <TextOutput/>
@@ -190,7 +190,7 @@
         <!--<Logger time-step="1.0">
             <Input>
                 <Symbol symbol-ref="flux_in_medium"/>
-                <Symbol symbol-ref="tmax"/>
+                <Symbol symbol-ref="rRef"/>
                 <Symbol symbol-ref="eTNFa"/>
             </Input>
             <Output>
@@ -317,15 +317,15 @@
                 <Constant symbol="tr1a" name="synthesis of IKBA protein" value="0.2448"/>
                 <Constant symbol="ktrans" value="0.0769"/>
                 <Constant symbol="s3" value="1.0"/>
-                <Constant symbol="t1" value="3.8e-4"/>
+                <Constant symbol="r1" value="3.8e-4"/>
                 <Constant symbol="s1" value="1.9e-5*1680"/>
                 <Constant symbol="s2" value="0.1"/>
                 <Constant symbol="s20" value="7.7e-4*60"/>
-                <Constant symbol="d0" value="5e-5*60"/>
-                <Constant symbol="t9" value="1"/>
-                <Constant symbol="t4" value="2e-4*60"/>
-                <Constant symbol="t7" value="0.15"/>
-                <Constant symbol="d20" value="0.01"/>
+                <Constant symbol="d0" value="0.01"/>
+                <Constant symbol="tr1b" value="1"/>
+                <Constant symbol="d4" value="2e-4*60"/>
+                <Constant symbol="tr3b" value="0.15"/>
+                <Constant symbol="d2" value="0.01"/>
                 <Constant symbol="d6" value="0.223"/>
                 <DiffEqn symbol-ref="NFKB">
                     <Expression>r4*IKK_NFKB_IKBA-a4*IKBA*NFKB-a4i*IKK_IKBA*NFKB-k1*NFKB</Expression>
@@ -373,13 +373,13 @@
                     <Expression>-ktrans*LPS + ktrans*stimulus</Expression>
                 </DiffEqn>
                 <DiffEqn symbol-ref="iTNFa">
-                    <Expression>-t4*iTNFa+t9*TNFa.m-e1*iTNFa</Expression>
+                    <Expression>-d4*iTNFa+tr1b*TNFa.m-e1*iTNFa</Expression>
                 </DiffEqn>
                 <DiffEqn symbol-ref="eTNFa">
-                    <Expression>TNFaflux+e1*iTNFa-s0*eTNFa*TNFR-s1*TNFa_TNFR-d20*eTNFa</Expression>
+                    <Expression>TNFaflux+e1*iTNFa-s0*eTNFa*TNFR+s1*TNFa_TNFR-d2*eTNFa</Expression>
                 </DiffEqn>
                 <DiffEqn symbol-ref="TNFR">
-                    <Expression>t1*(tmax-TNFR)-s0*eTNFa*TNFR+s1*TNFa_TNFR</Expression>
+                    <Expression>r1*(rRef-TNFR)-s0*eTNFa*TNFR+s1*TNFa_TNFR</Expression>
                 </DiffEqn>
                 <DiffEqn symbol-ref="TNFa_TNFR">
                     <Expression>-s1*TNFa_TNFR+s0*eTNFa*TNFR-s20*TNFa_TNFR</Expression>
@@ -388,7 +388,7 @@
                     <Expression>s20*TNFa_TNFR-d0*TNFR.i</Expression>
                 </DiffEqn>
                 <DiffEqn symbol-ref="TNFa.m">
-                    <Expression>t11*NFKB.n*NFKB.n-t7*TNFa.m</Expression>
+                    <Expression>tr4b*NFKB.n*NFKB.n-tr3b*TNFa.m</Expression>
                 </DiffEqn>
                 <!--    <Disabled>
         <Constant symbol="s0" value="1680"/>
@@ -413,17 +413,17 @@
             <Property symbol="stimulus" value="0.0"/>
             <Property symbol="iTNFa" name="internal TNFa" tags="cytoplasm" value="0.0"/>
             <Property symbol="eTNFa" name="external TNFa" tags="external" value="0.0"/>
-            <Property symbol="TNFR" name="TNFa Receptor in cell membrane" tags="membrane" value="tmax"/>
+            <Property symbol="TNFR" name="TNFa Receptor in cell membrane" tags="membrane" value="rRef"/>
             <Property symbol="TNFa_TNFR" name="complex of TNFa and TNFa Receptor" tags="membrane" value="0.0"/>
             <Property symbol="TNFR.i" name="internalized TNFa receptor" tags="cytoplasm" value="0.0"/>
             <Property symbol="TNFa.m" name="TNFa mRNA" tags="nucleus" value="0.0"/>
             <Property symbol="DTNF" value="1"/>
             <Property symbol="TNFaflux" value="0.0"/>
-            <Property symbol="tmax" value="0.01"/>
+            <Property symbol="rRef" value="0.01"/>
             <Property symbol="order" value="0"/>
             <Property symbol="e1" value="4.4e-4*60"/>
             <Property symbol="s0" value="1680"/>
-            <Property symbol="t11" value="37.2759372"/>
+            <Property symbol="tr4b" value="37.2759372"/>
             <Property symbol="tr4a" name="NF-KB-dependent transcription of IKBA mRNA " value="1.386"/>
             <SurfaceConstraint target="0.1" strength="1" mode="aspherity"/>
             <VolumeConstraint target="500" strength="1"/>
