@@ -22,7 +22,7 @@ pointsize <- function() {
   return(n)
 }
 
-load_all <- function(param="tmax", from=1, until=300) {
+load_all <- function(param="rRef", from=1, until=300) {
   dfs <- c()
   for (i in (from:until)){
     print(i)
@@ -37,7 +37,7 @@ load_all <- function(param="tmax", from=1, until=300) {
 }
 
 #### Aggregate multiple runs ####
-all_analysis <- function(dfs,param="tmax") {
+all_analysis <- function(dfs,param="rRef") {
   print(length(dfs))
   vals <- c()
   ret <- data.frame()
@@ -205,7 +205,7 @@ init <- function(parameter, seed = "42", sd_s=0.1/3) {
 make_expression <- function(i,sd) {
   d <- value*rnorm(1,1,sd)
   # print(typeof(d))
-  # tmaxes <<- c(tmaxes,d)
+  # rRefes <<- c(rRefes,d)
   if (i == 36){
     # return (paste("if(cell.id==36,",rlnorm(1,log(value^2/(sqrt(value^2+sd_s^2))),sqrt(log(1+(sd_s^2/value^2)))),",",value,")",sep=''))
     return (paste("if(cell.id==36,",d,",",value,")",sep=''))
@@ -269,7 +269,7 @@ load <- function(parameter="base", runn=-1) {
   df <- df |> mutate("dist" = cell_pos$new_dist)
   df <- df |> mutate("order" = rep(cellorder,times = 1301))
   
-  # df |> group_by(cell.id) |> select(tmax) |> slice(36) |> print()
+  # df |> group_by(cell.id) |> select(rRef) |> slice(36) |> print()
   
   df <- df |> mutate(activated_frac = TNFa_TNFR/(TNFa_TNFR+TNFR))
   
@@ -335,7 +335,7 @@ all_response_times <- function(valuedf,value="NFKB.n",t=800) {
 
 ##Midpoint for plotting
 midp <- function(color) {
-  if(color == "tmax") {
+  if(color == "rRef") {
     return(0.01)
   } else if (color == "NFKB.n") {
     return(0.005)
@@ -422,7 +422,7 @@ standard_plots <- function(dflist, cellid = 20) {
 }
 
 ###Plotting with ggarange
-arranging <- function(dflist,color="tmax",ploty="NFKB.n",title=c("Test")) {
+arranging <- function(dflist,color="rRef",ploty="NFKB.n",title=c("Test")) {
   dfs <- c()
   all_cols <- c()
   for (i in 1:(length(dflist)/3)) {
@@ -440,7 +440,7 @@ arranging <- function(dflist,color="tmax",ploty="NFKB.n",title=c("Test")) {
 }
 
 ### Plotting all curves of all cell ids 
-all_cells <- function(dflist,ploty="NFKB.n", color="tmax", scaled=FALSE,startt=-250,lims=c(0,0),titlel="t") {
+all_cells <- function(dflist,ploty="NFKB.n", color="rRef", scaled=FALSE,startt=-250,lims=c(0,0),titlel="t") {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   print(valuedf)
@@ -514,7 +514,7 @@ kymograph <- function(dflist,plott="NFKB.n",ploty="dist") {
 }
 
 ### Plotting time of Maximas of plott vs. plotx
-maxima <- function(dflist,color="NFKB.n",plotx="tmax",ploty="time",max="NFKB.n") {
+maxima <- function(dflist,color="NFKB.n",plotx="rRef",ploty="time",max="NFKB.n") {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
@@ -561,7 +561,7 @@ maxima <- function(dflist,color="NFKB.n",plotx="tmax",ploty="time",max="NFKB.n")
 }
 
 ### Plotting AUCs of all plott curves vs. plotx
-auc_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist") {
+auc_plot <- function(dflist,plott="NFKB.n",plotx="foldrRef",color="dist") {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
@@ -615,7 +615,7 @@ auc_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist") {
 }
 
 ### Plotting response times of all plott curves
-response_plot <- function(dflist,plott="NFKB.n",plotx="foldtmax",color="dist",t=800) {
+response_plot <- function(dflist,plott="NFKB.n",plotx="foldrRef",color="dist",t=800) {
   valuedf <- dflist$df
   save_path <- dflist$save_path
   
